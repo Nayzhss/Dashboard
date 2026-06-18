@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1781808118300",
+    "returnStatus": "waiting",
+    "shop": "Pandora",
+    "orderNumber": "PNDFR06076391",
+    "carrier": "DHL",
+    "trackingNumber": "5148102035",
+    "items": 1,
+    "amount": 173.99,
+    "paymentDate": "2026-06-15",
+    "status": "Remboursée",
+    "tech": "EB",
+    "note": ""
+  }
+]
