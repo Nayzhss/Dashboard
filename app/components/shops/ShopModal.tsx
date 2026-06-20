@@ -8,8 +8,27 @@ interface Props {
 }
 
 export function ShopModal({ slug, onClose }: Props) {
-  const { getShop } = useShops()
+  const { getShop, loading } = useShops()
   const shop = getShop(slug.toLowerCase())
+
+  if (!loading && !shop) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
+        <div className="bg-[#16161f] border border-white/10 rounded-2xl w-[420px] p-5 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 text-[#6b6b80] hover:text-white"
+          >
+            ✕
+          </button>
+          <p className="text-white font-semibold mb-1">{slug}</p>
+          <p className="text-sm text-[#6b6b80]">
+            Aucune donnée pour cette boutique pour l'instant.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   if (!shop) return null
 
