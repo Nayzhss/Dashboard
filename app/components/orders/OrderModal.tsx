@@ -7,7 +7,7 @@ import {
   DEFAULT_TECHS,
   RETURN_TECHS,
 } from "./types"
-import type { Order, OrderFormData } from "./types"
+import type { Order, OrderFormData, Status } from "./types"
 
 interface Props {
   mode: "create" | "edit"
@@ -239,7 +239,7 @@ export function OrderModal({
               onChange={(e) =>
                 set(
                   "status",
-                  e.target.value as any
+                  e.target.value as Status
                 )
               }
               className={inputCls}
@@ -254,7 +254,7 @@ export function OrderModal({
               ))}
             </select>
           </Field>
-        </div>
+
           <Field label="Tech">
             <select
               value={form.tech}
@@ -319,6 +319,7 @@ export function OrderModal({
           </button>
         </div>
       </div>
+    </div>
   )
 }
 

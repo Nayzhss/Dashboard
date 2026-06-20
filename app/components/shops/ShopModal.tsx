@@ -1,5 +1,6 @@
 "use client"
-import { getShop } from "../../data/shops"
+import Image from "next/image"
+import { useShops } from "../../hooks/useShops"
 
 interface Props {
   slug: string
@@ -7,17 +8,16 @@ interface Props {
 }
 
 export function ShopModal({ slug, onClose }: Props) {
+  const { getShop } = useShops()
   const shop = getShop(slug.toLowerCase())
 
-
-  console.log("SHOP =", shop)
-
-  
   if (!shop) return null
 
   const totalVouches = shop.methods.reduce((a, m) => a + m.vouches, 0)
   const totalFails = shop.methods.reduce((a, m) => a + m.fails, 0)
-  const maxAmount = Math.max(...shop.methods.map(m => m.maxAmount))
+  const maxAmount = shop.methods.length
+    ? Math.max(...shop.methods.map(m => m.maxAmount))
+    : 0
 
   return (
     
@@ -34,8 +34,11 @@ export function ShopModal({ slug, onClose }: Props) {
 
         {/* header */}
         <div className="flex items-center gap-3 mb-4">
-          <img
+          <Image
             src={`/logo/${shop.slug}.png`}
+            alt={shop.name}
+            width={40}
+            height={40}
             className="w-10 h-10 rounded-lg"
           />
           <div>

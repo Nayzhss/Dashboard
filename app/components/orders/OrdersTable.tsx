@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect, useMemo } from "react"
 import { createPortal } from "react-dom"
+import Image from "next/image"
 import { StatusBadge } from "./StatusBadge"
 import { STATUS_LIST } from "./types"
-import { getShop } from "../../data/shops"
+import { useShops } from "../../hooks/useShops"
 import type { Order, Status } from "./types"
 import { ShopModal } from "../shops/ShopModal"
 
@@ -36,16 +37,19 @@ function fmtDate(d: string) {
 }
 
 /**
- * Délai = jours depuis paymentDate
+ * Délai = jours depuis paymentDate, figé sur frozenDelay une fois remboursée/fail
  */
-function getDelay(paymentDate: string, status: Status) {
+function getDelay(paymentDate: string, status: Status, frozenDelay?: number) {
+  if (status === "Remboursée" || status === "Fail") {
+    return frozenDelay ?? 0
+  }
+
   if (!paymentDate) return 0
 
-  const endStatuses = ["Remboursée", "Fail"]
   const start = new Date(paymentDate).getTime()
   const end = new Date().getTime()
 
-  return Math.floor((end - start) / (1000 * 60 * 60 * 24))
+  return Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)))
 }
 
 /**
@@ -67,6 +71,7 @@ export function OrdersTable({
   onDuplicate,
   onStatusChange,
 }: Props) {
+  const { getShop } = useShops()
   const [statusMenu, setStatusMenu] = useState<string | null>(null)
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
   const [selectedShop, setSelectedShop] = useState<string | null>(null)
@@ -171,8 +176,8 @@ export function OrdersTable({
 
           <tbody className="bg-[#13131a]">
             {orders.map((o, idx) => {
-              const shop = getShop(o.shopSlug)
-              const delay = getDelay(o.paymentDate, o.status)
+              const shop = getShop(o.shopSlug.toLowerCase())
+              const delay = getDelay(o.paymentDate, o.status, o.frozenDelay)
 
               return (
                 <tr
@@ -185,8 +190,11 @@ export function OrdersTable({
   className="px-4 py-3.5 font-medium text-white flex items-center gap-2 cursor-pointer"
   onClick={() => setSelectedShop(o.shopSlug.toLowerCase())}
 >
-  <img
-    src={`/logo/${o.shopSlug}.png`}
+  <Image
+    src={`/logo/${o.shopSlug.toLowerCase()}.png`}
+    alt={shop?.name ?? o.shopSlug}
+    width={20}
+    height={20}
     className="w-5 h-5 rounded"
   />
 

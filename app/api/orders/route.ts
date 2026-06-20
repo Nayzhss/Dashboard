@@ -1,73 +1,103 @@
 import { NextRequest, NextResponse } from "next/server"
-import fs from "fs"
-import path from "path"
-
-const filePath = path.join(process.cwd(), "data", "orders.json")
-
-function readOrders(): any[] {
-  const raw = fs.readFileSync(filePath, "utf-8")
-  return JSON.parse(raw)
-}
-
-function writeOrders(orders: any[]): void {
-  fs.writeFileSync(filePath, JSON.stringify(orders, null, 2))
-}
+import { createClient } from "@/lib/supabase/server"
+import { rowToOrder, orderToRow, type OrderRow } from "@/lib/supabase/mappers"
+import type { OrderFormData } from "@/app/components/orders/types"
 
 export async function GET() {
-  const orders = readOrders()
-  return NextResponse.json(orders)
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .order("payment_date", { ascending: false })
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json((data as OrderRow[]).map(rowToOrder))
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const orders = readOrders()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const newOrder = {
-    id: Date.now().toString(),
-    returnStatus: "waiting",
-    ...body,
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  orders.unshift(newOrder) // newest first
-  writeOrders(orders)
+  const body: OrderFormData = await req.json()
 
-  return NextResponse.json(newOrder, { status: 201 })
+  const { data, error } = await supabase
+    .from("orders")
+    .insert({ ...orderToRow(body), user_id: user.id })
+    .select()
+    .single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(rowToOrder(data as OrderRow), { status: 201 })
 }
 
 export async function PUT(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { id, ...updates } = await req.json()
 
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 })
   }
 
-  const orders = readOrders()
-  const idx = orders.findIndex((o: any) => o.id === id)
+  const { data, error } = await supabase
+    .from("orders")
+    .update(orderToRow(updates))
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select()
+    .single()
 
-  if (idx === -1) {
+  if (error) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 })
   }
 
-  orders[idx] = { ...orders[idx], ...updates }
-  writeOrders(orders)
-
-  return NextResponse.json(orders[idx])
+  return NextResponse.json(rowToOrder(data as OrderRow))
 }
 
 export async function DELETE(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { id } = await req.json()
 
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 })
   }
 
-  const orders = readOrders()
-  const updated = orders.filter((o: any) => o.id !== id)
+  const { error, count } = await supabase
+    .from("orders")
+    .delete({ count: "exact" })
+    .eq("id", id)
+    .eq("user_id", user.id)
 
-  if (updated.length === orders.length) {
+  if (error || !count) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 })
   }
 
-  writeOrders(updated)
   return NextResponse.json({ success: true })
 }

@@ -1,7 +1,7 @@
 interface Stats {
   total: number
   totalAmount: number
-  avgAmount: number
+  monthlyProfit: number
   pending: number
   refunded: number
   failed: number
@@ -66,7 +66,11 @@ export function StatsBar({ stats, loading }: Props) {
         value={fmt(stats.totalAmount)}
         accent="text-violet-300"
       />
-      <StatCard label="Montant moyen" value={fmt(stats.avgAmount)} />
+      <StatCard
+        label="Bénéf du mois"
+        value={fmt(stats.monthlyProfit)}
+        accent={stats.monthlyProfit < 0 ? "text-red-400" : "text-emerald-300"}
+      />
       <StatCard
         label="En attente"
         value={String(stats.pending)}

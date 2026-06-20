@@ -9,6 +9,7 @@ import { OrdersTable } from "@/app/components/orders/OrdersTable"
 import { OrderModal } from "@/app/components/orders/OrderModal"
 import { DeleteConfirm } from "@/app/components/orders/DeleteConfirm"
 import { ToastContainer } from "@/app/components/orders/Toast"
+import { LogoutButton } from "@/app/components/LogoutButton"
 import type { Order, OrderFormData, Status } from "@/app/components/orders/types"
 
 type ModalState =
@@ -104,18 +105,30 @@ export default function DashboardPage() {
       {/* Nav */}
       <header className="border-b border-white/5 bg-[#0b0b10]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-md bg-violet-500 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4" />
-              </svg>
+          <div className="flex items-center gap-4">
+            <a
+              href="/"
+              className="text-sm text-violet-300 hover:text-violet-200"
+            >
+              ← Boutiques
+            </a>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-md bg-violet-500 flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4" />
+                </svg>
+              </div>
+              <span className="font-semibold text-sm text-white">Remboursements</span>
             </div>
-            <span className="font-semibold text-sm text-white">Remboursements</span>
           </div>
 
-          <span className="text-xs text-[#3a3a50]">
-            {orders.length} commande{orders.length !== 1 ? "s" : ""}
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-[#3a3a50]">
+              {orders.length} commande{orders.length !== 1 ? "s" : ""}
+            </span>
+            <LogoutButton />
+          </div>
         </div>
       </header>
 

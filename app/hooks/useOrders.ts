@@ -377,9 +377,22 @@ export function useOrders() {
         0
       )
 
-    const avgAmount = total
-      ? totalAmount / total
-      : 0
+    const now = new Date()
+    const isThisMonth = (dateStr: string) => {
+      if (!dateStr) return false
+      const d = new Date(dateStr)
+      return (
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth()
+      )
+    }
+
+    const monthlyProfit = orders.reduce((s, o) => {
+      if (!isThisMonth(o.paymentDate)) return s
+      if (o.status === "Remboursée") return s + Number(o.amount)
+      if (o.status === "Fail") return s - Number(o.amount)
+      return s
+    }, 0)
 
     const pending =
       orders.filter(
@@ -404,7 +417,7 @@ export function useOrders() {
     return {
       total,
       totalAmount,
-      avgAmount,
+      monthlyProfit,
       pending,
       refunded,
       failed,
