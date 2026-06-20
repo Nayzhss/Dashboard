@@ -246,7 +246,7 @@ export function useOrders() {
       [
         ...new Set(
           orders
-            .map((o) => o.shop)
+            .map((o) => o.shopSlug)
             .filter(Boolean)
         ),
       ].sort(),
@@ -273,7 +273,7 @@ export function useOrders() {
       .filter((o) => {
         if (
           q &&
-          !o.shop
+          !o.shopSlug
             .toLowerCase()
             .includes(q) &&
           !o.orderNumber
@@ -297,7 +297,7 @@ export function useOrders() {
 
         if (
           filters.shop &&
-          o.shop !== filters.shop
+          o.shopSlug !== filters.shop
         )
           return false
 
@@ -347,8 +347,8 @@ export function useOrders() {
           sortField === "shop"
         ) {
           cmp =
-            a.shop.localeCompare(
-              b.shop
+            a.shopSlug.localeCompare(
+              b.shopSlug
             )
         }
 

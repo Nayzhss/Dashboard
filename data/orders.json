@@ -1,8 +1,22 @@
 [
   {
-    "id": "1781808118300",
+    "id": "1781920357931",
     "returnStatus": "waiting",
-    "shop": "Pandora",
+    "shopSlug": "Backmarket",
+    "orderNumber": "#82173102",
+    "carrier": "DHL",
+    "trackingNumber": "",
+    "items": 1,
+    "amount": 1254.99,
+    "paymentDate": "2026-06-16",
+    "status": "Retour",
+    "tech": "LIT SCAN",
+    "note": ""
+  },
+  {
+    "id": "1781919414525",
+    "returnStatus": "waiting",
+    "shopSlug": "Pandora",
     "orderNumber": "PNDFR06076391",
     "carrier": "DHL",
     "trackingNumber": "5148102035",
@@ -11,6 +25,9 @@
     "paymentDate": "2026-06-15",
     "status": "Remboursée",
     "tech": "EB",
-    "note": ""
+    "note": "",
+    "shop": "Pandora",
+    "deliveredAt": "2026-06-20T01:36:26.749Z",
+    "frozenDelay": 5
   }
 ]

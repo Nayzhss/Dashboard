@@ -1,9 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
+import { createPortal } from "react-dom"
 import { StatusBadge } from "./StatusBadge"
 import { STATUS_LIST } from "./types"
+import { getShop } from "../../data/shops"
 import type { Order, Status } from "./types"
+import { ShopModal } from "../shops/ShopModal"
 
 interface Props {
   orders: Order[]
@@ -65,17 +68,54 @@ export function OrdersTable({
   onStatusChange,
 }: Props) {
   const [statusMenu, setStatusMenu] = useState<string | null>(null)
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
+  const [selectedShop, setSelectedShop] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handle(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      const insideTable = menuRef.current?.contains(target)
+      const insideDropdown = dropdownRef.current?.contains(target)
+      if (!insideTable && !insideDropdown) {
         setStatusMenu(null)
       }
     }
     document.addEventListener("mousedown", handle)
     return () => document.removeEventListener("mousedown", handle)
   }, [])
+
+  // ferme le menu si on scrolle (table ou page) pour éviter qu'il reste mal positionné
+  useEffect(() => {
+    if (!statusMenu) return
+    function close() {
+      setStatusMenu(null)
+    }
+    window.addEventListener("scroll", close, true)
+    window.addEventListener("resize", close)
+    return () => {
+      window.removeEventListener("scroll", close, true)
+      window.removeEventListener("resize", close)
+    }
+  }, [statusMenu])
+
+  function toggleStatusMenu(orderId: string, e: React.MouseEvent<HTMLButtonElement>) {
+    if (statusMenu === orderId) {
+      setStatusMenu(null)
+      return
+    }
+    const rect = e.currentTarget.getBoundingClientRect()
+    const menuHeight = STATUS_LIST.length * 34 + 8
+    const spaceBelow = window.innerHeight - rect.bottom
+    const openUp = spaceBelow < menuHeight && rect.top > menuHeight
+
+    setMenuPos({
+      top: openUp ? rect.top - menuHeight - 4 : rect.bottom + 4,
+      left: rect.left,
+    })
+    setStatusMenu(orderId)
+  }
 
   /* ───────── loading ───────── */
 
@@ -131,6 +171,7 @@ export function OrdersTable({
 
           <tbody className="bg-[#13131a]">
             {orders.map((o, idx) => {
+              const shop = getShop(o.shopSlug)
               const delay = getDelay(o.paymentDate, o.status)
 
               return (
@@ -140,9 +181,19 @@ export function OrdersTable({
                     idx % 2 === 0 ? "" : "bg-[#16161f]/50"
                   }`}
                 >
-                  <td className="px-4 py-3.5 font-medium text-white">
-                    {o.shop || "—"}
-                  </td>
+                  <td
+  className="px-4 py-3.5 font-medium text-white flex items-center gap-2 cursor-pointer"
+  onClick={() => setSelectedShop(o.shopSlug.toLowerCase())}
+>
+  <img
+    src={`/logo/${o.shopSlug}.png`}
+    className="w-5 h-5 rounded"
+  />
+
+  <span className="hover:underline">
+    {shop?.name ?? o.shopSlug}
+  </span>
+</td>
 
                   <td className="px-4 py-3.5 font-mono text-xs text-[#8080a0]">
                     {o.orderNumber || "—"}
@@ -193,32 +244,9 @@ export function OrdersTable({
 
                   {/* STATUS */}
                   <td className="px-4 py-3.5 relative">
-                    <button
-                      onClick={() =>
-                        setStatusMenu(
-                          statusMenu === o.id ? null : o.id
-                        )
-                      }
-                    >
+                    <button onClick={(e) => toggleStatusMenu(o.id, e)}>
                       <StatusBadge status={o.status} />
                     </button>
-
-                    {statusMenu === o.id && (
-                      <div className="absolute left-4 top-full mt-1 w-44 bg-[#1a1a2e] border border-white/10 rounded-xl z-50 py-1">
-                        {STATUS_LIST.map((s) => (
-                          <button
-                            key={s}
-                            onClick={async () => {
-                              await onStatusChange(o.id, s)
-                              setStatusMenu(null)
-                            }}
-                            className="w-full text-left px-3 py-2 text-xs hover:bg-white/5"
-                          >
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </td>
 
                   {/* ACTIONS */}
@@ -239,6 +267,35 @@ export function OrdersTable({
           </tbody>
         </table>
       </div>
+      {selectedShop && (
+  <ShopModal
+    slug={selectedShop}
+    onClose={() => setSelectedShop(null)}
+  />
+)}
+      {statusMenu &&
+        menuPos &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            style={{ top: menuPos.top, left: menuPos.left }}
+            className="fixed w-44 max-h-[60vh] overflow-y-auto bg-[#1a1a2e] border border-white/10 rounded-xl z-50 py-1 shadow-xl shadow-black/40"
+          >
+            {STATUS_LIST.map((s) => (
+              <button
+                key={s}
+                onClick={async () => {
+                  await onStatusChange(statusMenu, s)
+                  setStatusMenu(null)
+                }}
+                className="w-full text-left px-3 py-2 text-xs hover:bg-white/5"
+              >
+                {s}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   )
 }

@@ -31,7 +31,7 @@ export function OrderModal({
   useEffect(() => {
     if (mode === "edit" && order) {
       setForm({
-        shop: order.shop,
+        shopSlug: order.shopSlug,
         orderNumber: order.orderNumber,
         carrier: order.carrier,
         trackingNumber: order.trackingNumber,
@@ -92,7 +92,7 @@ export function OrderModal({
             {mode === "edit" &&
               order && (
                 <p className="text-xs text-[#6b6b80] mt-0.5">
-                  {order.shop}
+                  {order.shopSlug}
                 </p>
               )}
           </div>
@@ -122,10 +122,10 @@ export function OrderModal({
             <Field label="Boutique *">
               <input
                 type="text"
-                value={form.shop}
+                value={form.shopSlug}
                 onChange={(e) =>
                   set(
-                    "shop",
+                    "shopSlug",
                     e.target.value
                   )
                 }
@@ -305,7 +305,7 @@ export function OrderModal({
           <button
             onClick={handleSave}
             disabled={
-              !form.shop || loading
+              !form.shopSlug || loading
             }
             className="flex-1 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
           >

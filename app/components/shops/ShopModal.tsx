@@ -1,0 +1,100 @@
+"use client"
+import { getShop } from "../../data/shops"
+
+interface Props {
+  slug: string
+  onClose: () => void
+}
+
+export function ShopModal({ slug, onClose }: Props) {
+  const shop = getShop(slug.toLowerCase())
+
+
+  console.log("SHOP =", shop)
+
+  
+  if (!shop) return null
+
+  const totalVouches = shop.methods.reduce((a, m) => a + m.vouches, 0)
+  const totalFails = shop.methods.reduce((a, m) => a + m.fails, 0)
+  const maxAmount = Math.max(...shop.methods.map(m => m.maxAmount))
+
+  return (
+    
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
+      <div className="bg-[#16161f] border border-white/10 rounded-2xl w-[420px] p-5 relative">
+
+        {/* close */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-[#6b6b80] hover:text-white"
+        >
+          ✕
+        </button>
+
+        {/* header */}
+        <div className="flex items-center gap-3 mb-4">
+          <img
+            src={`/logo/${shop.slug}.png`}
+            className="w-10 h-10 rounded-lg"
+          />
+          <div>
+            <p className="text-white font-semibold">{shop.name}</p>
+            <p className="text-xs text-[#6b6b80]">{shop.slug}</p>
+          </div>
+        </div>
+
+        {/* infos */}
+        <div className="space-y-2 text-sm text-[#cfcfe6]">
+
+          <p>
+            🌐{" "}
+            <a className="text-violet-300 hover:underline" href={shop.website} target="_blank">
+              Website
+            </a>
+          </p>
+
+          <p>
+            📩{" "}
+            <a className="text-violet-300 hover:underline" href={shop.contactUrl} target="_blank">
+              Contact
+            </a>
+          </p>
+
+          <p>📞 {shop.phone || "—"}</p>
+
+          <p>📧 {shop.mail || "—"}</p>
+
+          <p>🔥 Account fresh : {shop.accountFresh ? "Yes" : "No"}</p>
+
+          <p>👍 Total vouches : {totalVouches}</p>
+          <p>❌ Total fails : {totalFails}</p>
+
+          <p>💰 Max amount : {maxAmount}€</p>
+
+          <p>
+            🚚 Delivery : {shop.shipping.delivery.join(", ")}
+          </p>
+
+          <p>
+            📦 Returns : {shop.shipping.return.join(", ")}
+          </p>
+
+          <div className="pt-2 border-t border-white/10 mt-2">
+            <p className="text-xs text-[#6b6b80] mb-1">Methods</p>
+
+            {shop.methods.map((m) => (
+              <div key={m.name} className="text-xs text-[#cfcfe6] mb-2">
+                <div className="font-semibold">{m.name}</div>
+                <div>👍 {m.vouches} / ❌ {m.fails}</div>
+                <div>⏱ {m.avgDelay === 9999 ? "N/A" : m.avgDelay + "j"}</div>
+                <div>💰 {m.maxAmount}€</div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}

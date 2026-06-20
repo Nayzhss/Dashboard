@@ -14,7 +14,7 @@ export type SortDir = "asc" | "desc"
 
 export interface Order {
   id: string
-  shop: string
+  shopSlug: string
   orderNumber: string
   carrier: string
   trackingNumber: string
@@ -34,7 +34,7 @@ export interface Order {
 }
 
 export interface OrderFormData {
-  shop: string
+  shopSlug: string
   orderNumber: string
   carrier: string
   trackingNumber: string
@@ -137,14 +137,13 @@ export const DEFAULT_TECHS = [
 ] as const
 
 export const RETURN_TECHS = [
-  "LIT",
-  "SCAN",
+  "LIT SCAN",
   "LIT TRANSIT",
   "FTID",
 ] as const
 
 export const EMPTY_FORM: OrderFormData = {
-  shop: "",
+  shopSlug: "",
   orderNumber: "",
   carrier: "",
   trackingNumber: "",

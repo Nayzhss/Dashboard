@@ -1,192 +1,118 @@
-"use client"
+import Image from "next/image"
+import { SHOPS, getShopScore } from "./data/shops"
 
-import { useState } from "react"
-import { useOrders } from "./hooks/useOrders"
-import { useToast } from "./hooks/useToast"
-import { StatsBar } from "./components/orders/StatsBar"
-import { Toolbar } from "./components/orders/Toolbar"
-import { OrdersTable } from "./components/orders/OrdersTable"
-import { OrderModal } from "./components/orders/OrderModal"
-import { DeleteConfirm } from "./components/orders/DeleteConfirm"
-import { ToastContainer } from "./components/orders/Toast"
-import type { Order, OrderFormData, Status } from "./components/orders/types"
+const sortedShops = [...SHOPS].sort(
+  (a, b) => getShopScore(b) - getShopScore(a)
+)
 
-type ModalState =
-  | { type: "none" }
-  | { type: "create" }
-  | { type: "edit"; order: Order }
-  | { type: "delete"; order: Order }
+const featured = sortedShops[0]
 
 export default function Home() {
-  const {
-    filteredOrders,
-    orders,
-    loading,
-    filters,
-    setFilters,
-    sortField,
-    sortDir,
-    toggleSort,
-    uniqueShops,
-    uniqueCarriers,
-    stats,
-    createOrder,
-    updateOrder,
-    deleteOrder,
-    duplicateOrder,
-  } = useOrders()
-
-  const { toasts, addToast, removeToast } = useToast()
-  const [modal, setModal] = useState<ModalState>({ type: "none" })
-
-  // ─── Handlers ────────────────────────────────────────────────────────────────
-
-  async function handleCreate(data: OrderFormData) {
-    try {
-      await createOrder(data)
-      addToast("Commande créée", "success")
-    } catch {
-      addToast("Erreur lors de la création", "error")
-      throw new Error()
-    }
-  }
-
-  async function handleEdit(data: OrderFormData) {
-    if (modal.type !== "edit") return
-    try {
-      await updateOrder(modal.order.id, data)
-      addToast("Commande mise à jour", "success")
-    } catch {
-      addToast("Erreur lors de la mise à jour", "error")
-      throw new Error()
-    }
-  }
-
-  async function handleDelete() {
-    if (modal.type !== "delete") return
-    try {
-      await deleteOrder(modal.order.id)
-      addToast("Commande supprimée", "success")
-      setModal({ type: "none" })
-    } catch {
-      addToast("Erreur lors de la suppression", "error")
-      throw new Error()
-    }
-  }
-
-  async function handleDuplicate(order: Order) {
-    try {
-      await duplicateOrder(order)
-      addToast(`"${order.shop}" dupliquée`, "success")
-    } catch {
-      addToast("Erreur lors de la duplication", "error")
-    }
-  }
-
-  async function handleStatusChange(id: string, status: Status) {
-    try {
-      await updateOrder(id, {
-        status,
-        ...(status === "Livrée"
-          ? { deliveredAt: new Date().toISOString(), returnStatus: "waiting" }
-          : {}),
-      })
-      addToast("Statut mis à jour", "success")
-    } catch {
-      addToast("Erreur lors du changement de statut", "error")
-    }
-  }
-
-  // ─── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <main className="min-h-screen bg-[#0b0b10] text-white">
-      {/* Nav */}
-      <header className="border-b border-white/5 bg-[#0b0b10]/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-md bg-violet-500 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4" />
-              </svg>
-            </div>
-            <span className="font-semibold text-sm text-white">Remboursements</span>
-          </div>
 
-          <span className="text-xs text-[#3a3a50]">
-            {orders.length} commande{orders.length !== 1 ? "s" : ""}
-          </span>
-        </div>
+      {/* HEADER */}
+      <header className="flex justify-between items-center px-6 py-4 border-b border-white/5">
+        <h1 className="font-semibold">Boutiques</h1>
+
+        <a
+          href="/dashboard"
+          className="text-sm text-violet-300 hover:text-violet-200"
+        >
+          Dashboard
+        </a>
       </header>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Page title */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
-            Dashboard
-          </h1>
-          <p className="text-sm text-[#4a4a60] mt-1">
-            Suivi et gestion des remboursements
+      {/* LAYOUT */}
+      <div className="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-3 gap-6">
+
+        {/* FEATURED */}
+        <div className="lg:col-span-1">
+          <p className="text-xs text-[#6b6b80] mb-3">
+            Boutique du moment
           </p>
+
+          <div className="bg-[#16161f] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition">
+
+            <Image
+              src={`/logo/${featured.slug}.png`}
+              alt={featured.name}
+              width={80}
+              height={80}
+              className="rounded-xl mb-4"
+            />
+
+            <h2 className="text-lg font-semibold">
+              {featured.name}
+            </h2>
+
+            <p className="text-sm text-[#6b6b80] mt-1">
+              {featured.website}
+            </p>
+
+            <p className="text-xs text-[#6b6b80] mt-2">
+              Methods: {featured.methods.length}
+            </p>
+
+            <button className="mt-4 w-full bg-violet-600 hover:bg-violet-500 rounded-xl py-2 text-sm">
+              Voir la boutique
+            </button>
+          </div>
         </div>
 
-        {/* Stats */}
-        <StatsBar stats={stats} loading={loading} />
+        {/* GRID */}
+        <div className="lg:col-span-2">
+          <p className="text-xs text-[#6b6b80] mb-3">
+            Toutes les boutiques
+          </p>
 
-        {/* Toolbar */}
-        <Toolbar
-          filters={filters}
-          setFilters={setFilters}
-          sortField={sortField}
-          sortDir={sortDir}
-          toggleSort={toggleSort}
-          uniqueShops={uniqueShops}
-          uniqueCarriers={uniqueCarriers}
-          totalVisible={filteredOrders.length}
-          totalAll={orders.length}
-          onNew={() => setModal({ type: "create" })}
-        />
+          <div className="grid sm:grid-cols-2 gap-4">
 
-        {/* Table */}
-        <OrdersTable
-          orders={filteredOrders}
-          loading={loading}
-          onEdit={(order) => setModal({ type: "edit", order })}
-          onDelete={(order) => setModal({ type: "delete", order })}
-          onDuplicate={handleDuplicate}
-          onStatusChange={handleStatusChange}
-        />
+            {sortedShops.map((shop) => (
+              <div
+                key={shop.slug}
+                className="bg-[#16161f] border border-white/5 rounded-2xl p-5 hover:border-white/10 transition cursor-pointer"
+              >
+
+                <div className="flex items-center gap-3">
+
+                  <Image
+                    src={`/logo/${shop.slug}.png`}
+                    alt={shop.name}
+                    width={40}
+                    height={40}
+                    className="rounded-lg"
+                  />
+
+                  <div>
+                    <p className="font-medium">
+                      {shop.name}
+                    </p>
+
+                    <p className="text-xs text-[#6b6b80]">
+                      {shop.website}
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="mt-3 text-xs text-[#6b6b80] space-y-1">
+                  <p>🔥 Score: {Math.round(getShopScore(shop))}</p>
+                  <p>🧠 Methods: {shop.methods.length}</p>
+                  <p>🚚 Delivery: {shop.shipping.delivery.join(", ")}</p>
+                </div>
+
+                <button className="mt-4 text-xs text-violet-300 hover:text-violet-200">
+                  Ouvrir →
+                </button>
+
+              </div>
+            ))}
+
+          </div>
+        </div>
+
       </div>
-
-      {/* Modals */}
-      {modal.type === "create" && (
-        <OrderModal
-          mode="create"
-          onSave={handleCreate}
-          onClose={() => setModal({ type: "none" })}
-        />
-      )}
-
-      {modal.type === "edit" && (
-        <OrderModal
-          mode="edit"
-          order={modal.order}
-          onSave={handleEdit}
-          onClose={() => setModal({ type: "none" })}
-        />
-      )}
-
-      {modal.type === "delete" && (
-        <DeleteConfirm
-          shopName={modal.order.shop}
-          onConfirm={handleDelete}
-          onCancel={() => setModal({ type: "none" })}
-        />
-      )}
-
-      {/* Toasts */}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </main>
   )
 }
