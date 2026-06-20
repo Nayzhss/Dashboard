@@ -38,7 +38,7 @@ create table if not exists shop_methods (
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  shop_slug text references shops(slug),
+  shop_slug text, -- no FK: orders can reference shop names not yet in `shops`
   order_number text not null default '',
   carrier text not null default '',
   tracking_number text not null default '',
