@@ -109,6 +109,15 @@ create policy "shops readable by authenticated users"
   to authenticated
   using (true);
 
+-- shared catalog: any logged-in user can fill in missing shop info
+-- (carrier, phone, notes...), there's no admin/owner concept here
+drop policy if exists "shops: authenticated update" on shops;
+create policy "shops: authenticated update"
+  on shops for update
+  to authenticated
+  using (true)
+  with check (true);
+
 drop policy if exists "shop_methods readable by authenticated users" on shop_methods;
 create policy "shop_methods readable by authenticated users"
   on shop_methods for select
