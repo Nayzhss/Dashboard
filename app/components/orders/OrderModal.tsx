@@ -8,6 +8,7 @@ import {
   RETURN_TECHS,
 } from "./types"
 import type { Order, OrderFormData, Status } from "./types"
+import { ShopNameInput } from "../shops/ShopNameInput"
 
 interface Props {
   mode: "create" | "edit"
@@ -120,15 +121,9 @@ export function OrderModal({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Boutique *">
-              <input
-                type="text"
+              <ShopNameInput
                 value={form.shopSlug}
-                onChange={(e) =>
-                  set(
-                    "shopSlug",
-                    e.target.value
-                  )
-                }
+                onChange={(value) => set("shopSlug", value)}
                 placeholder="Nike, Zara…"
                 className={inputCls}
               />

@@ -75,16 +75,28 @@ create table if not exists profiles (
 );
 
 -- populates `profiles` automatically from the `username` passed in
--- auth.signUp's options.data, regardless of email-confirmation timing
+-- auth.signUp's options.data, regardless of email-confirmation timing.
+-- Falls back to a generated username when none is supplied (e.g. a user
+-- created directly from the Supabase dashboard instead of /signup), since
+-- otherwise the missing not-null username would roll back the whole
+-- auth.users insert with an opaque 500.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  uname text;
 begin
+  uname := coalesce(
+    new.raw_user_meta_data->>'username',
+    'user-' || substr(new.id::text, 1, 8)
+  );
+
   insert into public.profiles (id, username, email)
-  values (new.id, new.raw_user_meta_data->>'username', new.email);
+  values (new.id, uname, new.email);
+
   return new;
 end;
 $$;
