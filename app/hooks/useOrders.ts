@@ -397,8 +397,8 @@ export function useOrders() {
     const pending =
       orders.filter(
         (o) =>
-          o.status ===
-          "En attente"
+          o.status !== "Remboursée" &&
+          o.status !== "Fail"
       ).length
 
     const refunded =

@@ -31,24 +31,13 @@ export interface Shop {
 
 }
 
+/**
+ * Rentabilité = montant max / délai, en prenant la meilleure méthode de la boutique.
+ */
 export function getShopScore(shop: Shop) {
-  const totalVouches = shop.methods.reduce((a, m) => a + m.vouches, 0)
-  const totalFails = shop.methods.reduce((a, m) => a + m.fails, 0)
-const validMethods = shop.methods.filter(m => m.avgDelay !== null)
+  const ratios = shop.methods
+    .filter((m) => m.avgDelay !== null && m.avgDelay > 0)
+    .map((m) => m.maxAmount / (m.avgDelay as number))
 
-const avgDelay =
-  validMethods.length
-    ? validMethods.reduce((a, m) => a + (m.avgDelay ?? 0), 0) /
-      validMethods.length
-    : 0
-  const maxAmount = shop.methods.length
-    ? Math.max(...shop.methods.map(m => m.maxAmount))
-    : 0
-
-  return (
-    totalVouches * 2 -
-    totalFails * 3 +
-    maxAmount / 100 -
-    avgDelay
-  )
+  return ratios.length ? Math.max(...ratios) : 0
 }
