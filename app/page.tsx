@@ -5,7 +5,9 @@ import Image from "next/image"
 import { getShopScore } from "./data/shops"
 import { useShops } from "./hooks/useShops"
 import { ShopModal } from "./components/shops/ShopModal"
+import { ShopSearch } from "./components/shops/ShopSearch"
 import { Header } from "./components/Header"
+import { Footer } from "./components/Footer"
 
 const RANK_STYLES = [
   "border-violet-400/40 shadow-[0_0_24px_-8px_rgba(167,139,250,0.5)]",
@@ -33,12 +35,16 @@ export default function Home() {
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="mb-10">
-          <h1 className="text-2xl font-semibold tracking-tight">Boutiques</h1>
-          <p className="text-sm text-[#6b6b80] mt-1">
-            {shops.length} boutique{shops.length !== 1 ? "s" : ""} disponible
-            {shops.length !== 1 ? "s" : ""}
-          </p>
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Boutiques</h1>
+            <p className="text-sm text-[#6b6b80] mt-1">
+              {shops.length} boutique{shops.length !== 1 ? "s" : ""} disponible
+              {shops.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+
+          <ShopSearch shops={shops} onSelect={setSelectedShop} />
         </div>
 
         {loading ? (
@@ -131,6 +137,8 @@ export default function Home() {
           </>
         )}
       </div>
+
+      <Footer />
 
       {selectedShop && (
         <ShopModal slug={selectedShop} onClose={() => setSelectedShop(null)} />

@@ -10,6 +10,7 @@ import { OrderModal } from "@/app/components/orders/OrderModal"
 import { DeleteConfirm } from "@/app/components/orders/DeleteConfirm"
 import { ToastContainer } from "@/app/components/orders/Toast"
 import { Header } from "@/app/components/Header"
+import { Footer } from "@/app/components/Footer"
 import type { Order, OrderFormData, Status } from "@/app/components/orders/types"
 
 type ModalState =
@@ -148,6 +149,8 @@ export default function DashboardPage() {
           onStatusChange={handleStatusChange}
         />
       </div>
+
+      <Footer />
 
       {/* Modals */}
       {modal.type === "create" && (

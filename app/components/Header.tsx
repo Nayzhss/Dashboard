@@ -15,23 +15,13 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0b0b10]/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-6 h-6 rounded-md bg-violet-500 flex items-center justify-center">
-            <svg
-              className="w-3.5 h-3.5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"
-              />
-            </svg>
-          </div>
+          <img
+            src="/favicon.ico"
+            alt=""
+            className="w-6 h-6 rounded-md"
+          />
           <span className="font-semibold text-sm text-white hidden sm:inline">
-            Remboursements
+            OPENRF Community
           </span>
         </div>
 

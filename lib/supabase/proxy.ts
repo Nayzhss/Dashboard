@@ -1,7 +1,11 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-const PUBLIC_PATHS = ["/login", "/signup"]
+const PUBLIC_PAGES = ["/login", "/signup"]
+const PUBLIC_API_PATHS = [
+  "/api/auth/check-username",
+  "/api/auth/resolve-username",
+]
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -29,10 +33,16 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isPublicPath = PUBLIC_PATHS.includes(request.nextUrl.pathname)
-  const isApiPath = request.nextUrl.pathname.startsWith("/api/")
+  const pathname = request.nextUrl.pathname
+  const isPublicPage = PUBLIC_PAGES.includes(pathname)
+  const isPublicApiPath = PUBLIC_API_PATHS.includes(pathname)
+  const isApiPath = pathname.startsWith("/api/")
 
-  if (!user && !isPublicPath) {
+  if (isPublicApiPath) {
+    return supabaseResponse
+  }
+
+  if (!user && !isPublicPage) {
     if (isApiPath) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -41,7 +51,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && isPublicPath) {
+  if (user && isPublicPage) {
     const url = request.nextUrl.clone()
     url.pathname = "/"
     return NextResponse.redirect(url)

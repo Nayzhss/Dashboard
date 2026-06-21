@@ -2,24 +2,66 @@
 
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { PasswordInput } from "@/app/components/PasswordInput"
+
+const inputCls =
+  "w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
+
+const USERNAME_RE = /^[a-z0-9_-]{3,20}$/
 
 export default function SignupPage() {
   const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  async function checkUsername() {
+    const value = username.trim().toLowerCase()
+    if (!value) return
+
+    if (!USERNAME_RE.test(value)) {
+      setUsernameError("3-20 caractères : lettres, chiffres, - ou _")
+      return
+    }
+
+    const res = await fetch("/api/auth/check-username", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: value }),
+    })
+    const data = await res.json()
+    setUsernameError(data.available ? null : "Ce nom d'utilisateur est déjà pris")
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
 
+    const value = username.trim().toLowerCase()
+    if (!USERNAME_RE.test(value)) {
+      setUsernameError("3-20 caractères : lettres, chiffres, - ou _")
+      return
+    }
+
+    setLoading(true)
+
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { username: value } },
+    })
 
     if (error) {
-      setError(error.message)
+      setError(
+        error.message.toLowerCase().includes("duplicate") ||
+          error.message.toLowerCase().includes("unique")
+          ? "Ce nom d'utilisateur est déjà pris"
+          : error.message
+      )
       setLoading(false)
       return
     }
@@ -59,24 +101,40 @@ export default function SignupPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
+            className={inputCls}
           />
 
-          <input
-            type="password"
-            required
+          <div>
+            <input
+              type="text"
+              required
+              placeholder="Nom d'utilisateur"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value)
+                setUsernameError(null)
+              }}
+              onBlur={checkUsername}
+              className={inputCls}
+            />
+            {usernameError && (
+              <p className="text-xs text-red-400 mt-1">{usernameError}</p>
+            )}
+          </div>
+
+          <PasswordInput
+            value={password}
+            onChange={setPassword}
             minLength={6}
             placeholder="Mot de passe (6 caractères min.)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
+            className={inputCls}
           />
 
           {error && <p className="text-xs text-red-400">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !!usernameError}
             className="mt-2 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-xl py-2.5 text-sm font-medium transition-colors"
           >
             {loading ? "Création…" : "Créer mon compte"}

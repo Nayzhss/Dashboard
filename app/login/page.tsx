@@ -3,10 +3,14 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { PasswordInput } from "@/app/components/PasswordInput"
+
+const inputCls =
+  "w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
+  const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -16,6 +20,29 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
+    let email = identifier.trim()
+
+    if (!email.includes("@")) {
+      try {
+        const res = await fetch("/api/auth/resolve-username", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: email }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setError("Identifiants incorrects")
+          setLoading(false)
+          return
+        }
+        email = data.email
+      } catch {
+        setError("Identifiants incorrects")
+        setLoading(false)
+        return
+      }
+    }
+
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -23,7 +50,7 @@ export default function LoginPage() {
     })
 
     if (error) {
-      setError("Email ou mot de passe incorrect")
+      setError("Identifiants incorrects")
       setLoading(false)
       return
     }
@@ -42,21 +69,19 @@ export default function LoginPage() {
 
         <div className="flex flex-col gap-3">
           <input
-            type="email"
+            type="text"
             required
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
+            placeholder="Email ou nom d'utilisateur"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            className={inputCls}
           />
 
-          <input
-            type="password"
-            required
-            placeholder="Mot de passe"
+          <PasswordInput
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
+            onChange={setPassword}
+            placeholder="Mot de passe"
+            className={inputCls}
           />
 
           {error && <p className="text-xs text-red-400">{error}</p>}

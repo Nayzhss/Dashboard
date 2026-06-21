@@ -63,12 +63,45 @@ create index if not exists orders_user_id_idx on orders(user_id);
 alter table orders drop constraint if exists orders_shop_slug_fkey;
 
 -- ─────────────────────────────────────────────
+-- profiles (username login: maps a username to its auth email)
+-- ─────────────────────────────────────────────
+
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  username text unique not null,
+  email text not null,
+  created_at timestamptz not null default now(),
+  constraint username_format check (username ~ '^[a-z0-9_-]{3,20}$')
+);
+
+-- populates `profiles` automatically from the `username` passed in
+-- auth.signUp's options.data, regardless of email-confirmation timing
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, username, email)
+  values (new.id, new.raw_user_meta_data->>'username', new.email);
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- ─────────────────────────────────────────────
 -- RLS
 -- ─────────────────────────────────────────────
 
 alter table shops enable row level security;
 alter table shop_methods enable row level security;
 alter table orders enable row level security;
+alter table profiles enable row level security;
 
 drop policy if exists "shops readable by authenticated users" on shops;
 create policy "shops readable by authenticated users"
@@ -106,3 +139,9 @@ create policy "orders: owner delete"
   on orders for delete
   to authenticated
   using (user_id = auth.uid());
+
+drop policy if exists "profiles: owner select" on profiles;
+create policy "profiles: owner select"
+  on profiles for select
+  to authenticated
+  using (id = auth.uid());
