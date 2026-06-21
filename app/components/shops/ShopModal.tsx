@@ -14,15 +14,15 @@ export function ShopModal({ slug, onClose }: Props) {
   if (!loading && !shop) {
     return (
       <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-        <div className="bg-[#16161f] border border-white/10 rounded-2xl w-[420px] p-5 relative">
+        <div className="bg-[var(--surface)] border border-white/10 rounded-2xl w-[420px] p-5 relative">
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 text-[#6b6b80] hover:text-white"
+            className="absolute top-3 right-3 text-[var(--text-4)] hover:text-[var(--color-white)]"
           >
             ✕
           </button>
-          <p className="text-white font-semibold mb-1">{slug}</p>
-          <p className="text-sm text-[#6b6b80]">
+          <p className="text-[var(--color-white)] font-semibold mb-1">{slug}</p>
+          <p className="text-sm text-[var(--text-4)]">
             Aucune donnée pour cette boutique pour l'instant.
           </p>
         </div>
@@ -41,12 +41,12 @@ export function ShopModal({ slug, onClose }: Props) {
   return (
     
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-      <div className="bg-[#16161f] border border-white/10 rounded-2xl w-[420px] p-5 relative">
+      <div className="bg-[var(--surface)] border border-white/10 rounded-2xl w-[420px] p-5 relative">
 
         {/* close */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-[#6b6b80] hover:text-white"
+          className="absolute top-3 right-3 text-[var(--text-4)] hover:text-[var(--color-white)]"
         >
           ✕
         </button>
@@ -61,24 +61,24 @@ export function ShopModal({ slug, onClose }: Props) {
             className="w-10 h-10 rounded-lg"
           />
           <div>
-            <p className="text-white font-semibold">{shop.name}</p>
-            <p className="text-xs text-[#6b6b80]">{shop.slug}</p>
+            <p className="text-[var(--color-white)] font-semibold">{shop.name}</p>
+            <p className="text-xs text-[var(--text-4)]">{shop.slug}</p>
           </div>
         </div>
 
         {/* infos */}
-        <div className="space-y-2 text-sm text-[#cfcfe6]">
+        <div className="space-y-2 text-sm text-[var(--text-1)]">
 
           <p>
             🌐{" "}
-            <a className="text-violet-300 hover:underline" href={shop.website} target="_blank">
+            <a className="text-[var(--accent-300)] hover:underline" href={shop.website} target="_blank">
               Website
             </a>
           </p>
 
           <p>
             📩{" "}
-            <a className="text-violet-300 hover:underline" href={shop.contactUrl} target="_blank">
+            <a className="text-[var(--accent-300)] hover:underline" href={shop.contactUrl} target="_blank">
               Contact
             </a>
           </p>
@@ -103,10 +103,10 @@ export function ShopModal({ slug, onClose }: Props) {
           </p>
 
           <div className="pt-2 border-t border-white/10 mt-2">
-            <p className="text-xs text-[#6b6b80] mb-1">Methods</p>
+            <p className="text-xs text-[var(--text-4)] mb-1">Methods</p>
 
             {shop.methods.map((m) => (
-              <div key={m.name} className="text-xs text-[#cfcfe6] mb-2">
+              <div key={m.name} className="text-xs text-[var(--text-1)] mb-2">
                 <div className="font-semibold">{m.name}</div>
                 <div>👍 {m.vouches} / ❌ {m.fails}</div>
                 <div>⏱ {m.avgDelay === 9999 ? "N/A" : m.avgDelay + "j"}</div>

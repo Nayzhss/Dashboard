@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { PasswordInput } from "@/app/components/PasswordInput"
 
 const inputCls =
-  "w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50"
+  "w-full px-3 py-2 bg-[var(--input-bg)] border border-white/5 rounded-lg text-sm text-[var(--color-white)] placeholder:text-[var(--text-6)] focus:outline-none focus:border-[var(--accent-500)]/50"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -60,10 +60,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0b0b10] text-white px-4">
+    <main className="min-h-screen flex items-center justify-center bg-[var(--bg)] text-[var(--color-white)] px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm bg-[#16161f] border border-white/5 rounded-2xl p-6"
+        className="w-full max-w-sm bg-[var(--surface)] border border-white/5 rounded-2xl p-6"
       >
         <h1 className="text-lg font-semibold mb-6">Connexion</h1>
 
@@ -89,15 +89,15 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-xl py-2.5 text-sm font-medium transition-colors"
+            className="mt-2 w-full bg-[var(--accent-600)] hover:bg-[var(--accent-500)] disabled:opacity-40 rounded-xl py-2.5 text-sm font-medium text-[#fff] transition-colors"
           >
             {loading ? "Connexion…" : "Se connecter"}
           </button>
         </div>
 
-        <p className="text-xs text-[#6b6b80] mt-4 text-center">
+        <p className="text-xs text-[var(--text-4)] mt-4 text-center">
           Pas de compte ?{" "}
-          <a href="/signup" className="text-violet-300 hover:underline">
+          <a href="/signup" className="text-[var(--accent-300)] hover:underline">
             Créer un compte
           </a>
         </p>

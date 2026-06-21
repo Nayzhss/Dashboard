@@ -10,9 +10,9 @@ import { Header } from "./components/Header"
 import { Footer } from "./components/Footer"
 
 const RANK_STYLES = [
-  "border-violet-400/40 shadow-[0_0_24px_-8px_rgba(167,139,250,0.5)]",
-  "border-violet-400/20",
-  "border-violet-400/10",
+  "border-[var(--accent-400)]/40 shadow-[0_0_24px_-8px_rgba(167,139,250,0.5)]",
+  "border-[var(--accent-400)]/20",
+  "border-[var(--accent-400)]/10",
 ]
 
 function fmtScore(score: number) {
@@ -31,14 +31,14 @@ export default function Home() {
   const top3 = sortedShops.slice(0, 3)
 
   return (
-    <main className="min-h-screen bg-[#0b0b10] text-white">
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Boutiques</h1>
-            <p className="text-sm text-[#6b6b80] mt-1">
+            <p className="text-sm text-[var(--text-4)] mt-1">
               {shops.length} boutique{shops.length !== 1 ? "s" : ""} disponible
               {shops.length !== 1 ? "s" : ""}
             </p>
@@ -48,14 +48,14 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-[#6b6b80]">Chargement…</p>
+          <p className="text-sm text-[var(--text-4)]">Chargement…</p>
         ) : shops.length === 0 ? (
-          <p className="text-sm text-[#6b6b80]">Aucune boutique pour l'instant.</p>
+          <p className="text-sm text-[var(--text-4)]">Aucune boutique pour l'instant.</p>
         ) : (
           <>
             {/* TOP 3 RENTABILITÉ */}
             <section className="mb-12">
-              <p className="text-xs font-medium text-[#6b6b80] uppercase tracking-widest mb-4">
+              <p className="text-xs font-medium text-[var(--text-4)] uppercase tracking-widest mb-4">
                 Top 3 rentabilité
               </p>
 
@@ -64,9 +64,9 @@ export default function Home() {
                   <div
                     key={shop.slug}
                     onClick={() => setSelectedShop(shop.slug)}
-                    className={`relative bg-[#16161f] border rounded-2xl p-5 cursor-pointer transition-colors hover:border-violet-400/50 ${RANK_STYLES[i]}`}
+                    className={`relative bg-[var(--surface)] border rounded-2xl p-5 cursor-pointer transition-colors hover:border-[var(--accent-400)]/50 ${RANK_STYLES[i]}`}
                   >
-                    <span className="absolute top-4 right-4 w-6 h-6 rounded-full bg-violet-500/15 text-violet-300 text-xs font-semibold flex items-center justify-center">
+                    <span className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-500)]/15 text-[var(--accent-300)] text-xs font-semibold flex items-center justify-center">
                       {i + 1}
                     </span>
 
@@ -79,11 +79,11 @@ export default function Home() {
                     />
 
                     <h2 className="font-semibold leading-tight">{shop.name}</h2>
-                    <p className="text-xs text-[#6b6b80] mt-0.5 truncate">
+                    <p className="text-xs text-[var(--text-4)] mt-0.5 truncate">
                       {shop.website}
                     </p>
 
-                    <p className="mt-3 text-lg font-semibold text-violet-300">
+                    <p className="mt-3 text-lg font-semibold text-[var(--accent-300)]">
                       {fmtScore(getShopScore(shop))}
                     </p>
                   </div>
@@ -93,7 +93,7 @@ export default function Home() {
 
             {/* TOUTES LES BOUTIQUES */}
             <section>
-              <p className="text-xs font-medium text-[#6b6b80] uppercase tracking-widest mb-4">
+              <p className="text-xs font-medium text-[var(--text-4)] uppercase tracking-widest mb-4">
                 Toutes les boutiques
               </p>
 
@@ -102,7 +102,7 @@ export default function Home() {
                   <div
                     key={shop.slug}
                     onClick={() => setSelectedShop(shop.slug)}
-                    className="bg-[#16161f] border border-white/5 rounded-2xl p-5 cursor-pointer transition-colors hover:border-white/15"
+                    className="bg-[var(--surface)] border border-white/5 rounded-2xl p-5 cursor-pointer transition-colors hover:border-white/15"
                   >
                     <div className="flex items-center gap-3">
                       <Image
@@ -115,17 +115,17 @@ export default function Home() {
 
                       <div className="min-w-0">
                         <p className="font-medium truncate">{shop.name}</p>
-                        <p className="text-xs text-[#6b6b80] truncate">
+                        <p className="text-xs text-[var(--text-4)] truncate">
                           {shop.website}
                         </p>
                       </div>
                     </div>
 
                     <div className="mt-4 flex items-center justify-between text-xs">
-                      <span className="text-violet-300 font-semibold">
+                      <span className="text-[var(--accent-300)] font-semibold">
                         {fmtScore(getShopScore(shop))}
                       </span>
-                      <span className="text-[#6b6b80]">
+                      <span className="text-[var(--text-4)]">
                         {shop.methods.length} méthode
                         {shop.methods.length !== 1 ? "s" : ""}
                       </span>

@@ -24,14 +24,14 @@ function StatCard({
   accent?: string
 }) {
   return (
-    <div className="bg-[#16161f] border border-white/5 rounded-2xl p-5 flex flex-col gap-1 hover:border-white/10 transition-colors">
-      <p className="text-xs font-medium text-[#6b6b80] uppercase tracking-widest">
+    <div className="bg-[var(--surface)] border border-white/5 rounded-2xl p-5 flex flex-col gap-1 hover:border-white/10 transition-colors">
+      <p className="text-xs font-medium text-[var(--text-4)] uppercase tracking-widest">
         {label}
       </p>
-      <p className={`text-2xl font-semibold tabular-nums ${accent ?? "text-white"}`}>
+      <p className={`text-2xl font-semibold tabular-nums ${accent ?? "text-[var(--color-white)]"}`}>
         {value}
       </p>
-      {sub && <p className="text-xs text-[#6b6b80]">{sub}</p>}
+      {sub && <p className="text-xs text-[var(--text-4)]">{sub}</p>}
     </div>
   )
 }
@@ -51,7 +51,7 @@ export function StatsBar({ stats, loading }: Props) {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="bg-[#16161f] border border-white/5 rounded-2xl p-5 h-[82px] animate-pulse"
+            className="bg-[var(--surface)] border border-white/5 rounded-2xl p-5 h-[82px] animate-pulse"
           />
         ))}
       </div>
@@ -64,7 +64,7 @@ export function StatsBar({ stats, loading }: Props) {
       <StatCard
         label="Montant total"
         value={fmt(stats.totalAmount)}
-        accent="text-violet-300"
+        accent="text-[var(--accent-300)]"
       />
       <StatCard
         label="Bénéf du mois"
@@ -85,7 +85,7 @@ export function StatsBar({ stats, loading }: Props) {
       <StatCard
         label="Échecs"
         value={String(stats.failed)}
-        accent={stats.failed > 0 ? "text-red-400" : "text-white"}
+        accent={stats.failed > 0 ? "text-red-400" : "text-[var(--color-white)]"}
       />
     </div>
   )

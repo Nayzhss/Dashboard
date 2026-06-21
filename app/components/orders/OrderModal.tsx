@@ -76,14 +76,14 @@ export function OrderModal({
       onClick={onClose}
     >
       <div
-        className="bg-[#16161f] border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+        className="bg-[var(--surface)] border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl"
         onClick={(e) =>
           e.stopPropagation()
         }
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-base font-semibold text-white">
+            <h2 className="text-base font-semibold text-[var(--color-white)]">
               {mode === "create"
                 ? "Nouvelle commande"
                 : "Modifier la commande"}
@@ -91,7 +91,7 @@ export function OrderModal({
 
             {mode === "edit" &&
               order && (
-                <p className="text-xs text-[#6b6b80] mt-0.5">
+                <p className="text-xs text-[var(--text-4)] mt-0.5">
                   {order.shopSlug}
                 </p>
               )}
@@ -99,7 +99,7 @@ export function OrderModal({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4a4a60] hover:text-white hover:bg-white/5 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-5)] hover:text-[var(--color-white)] hover:bg-white/5 transition-colors"
           >
             <svg
               className="w-4 h-4"
@@ -297,7 +297,7 @@ export function OrderModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[#8080a0] hover:text-white hover:border-white/20 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[var(--text-3)] hover:text-[var(--color-white)] hover:border-white/20 transition-colors"
           >
             Annuler
           </button>
@@ -307,7 +307,7 @@ export function OrderModal({
             disabled={
               !form.shopSlug || loading
             }
-            className="flex-1 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--accent-600)] hover:bg-[var(--accent-500)] disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium text-[#fff] transition-colors"
           >
             {loading
               ? mode === "create"
@@ -332,7 +332,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-[#6b6b80]">
+      <label className="text-xs font-medium text-[var(--text-4)]">
         {label}
       </label>
       {children}
@@ -341,4 +341,4 @@ function Field({
 }
 
 const inputCls =
-  "w-full px-3 py-2 bg-[#0f0f14] border border-white/5 rounded-lg text-sm text-white placeholder:text-[#3a3a50] focus:outline-none focus:border-violet-500/50 transition-colors"
+  "w-full px-3 py-2 bg-[var(--input-bg)] border border-white/5 rounded-lg text-sm text-[var(--color-white)] placeholder:text-[var(--text-6)] focus:outline-none focus:border-[var(--accent-500)]/50 transition-colors"

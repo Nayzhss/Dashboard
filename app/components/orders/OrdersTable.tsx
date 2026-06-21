@@ -130,7 +130,7 @@ export function OrdersTable({
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="h-14 bg-[#16161f] rounded-xl animate-pulse border border-white/5"
+            className="h-14 bg-[var(--surface)] rounded-xl animate-pulse border border-white/5"
           />
         ))}
       </div>
@@ -142,7 +142,7 @@ export function OrdersTable({
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-[#6b6b80] font-medium">
+        <p className="text-[var(--text-4)] font-medium">
           Aucune commande trouvée
         </p>
       </div>
@@ -157,7 +157,7 @@ export function OrdersTable({
         <table className="w-full text-sm border-collapse">
 
           {/* HEADER */}
-          <thead className="sticky top-0 z-10 bg-[#0f0f14]">
+          <thead className="sticky top-0 z-10 bg-[var(--input-bg)]">
             <tr className="border-b border-white/5">
               <Th>Boutique</Th>
               <Th>Commande</Th>
@@ -174,7 +174,7 @@ export function OrdersTable({
             </tr>
           </thead>
 
-          <tbody className="bg-[#13131a]">
+          <tbody className="bg-[var(--table-bg)]">
             {orders.map((o, idx) => {
               const shop = getShop(o.shopSlug.toLowerCase())
               const delay = getDelay(o.paymentDate, o.status, o.frozenDelay)
@@ -182,12 +182,12 @@ export function OrdersTable({
               return (
                 <tr
                   key={o.id}
-                  className={`group border-b border-white/[0.03] hover:bg-[#1a1a27] transition-colors ${
-                    idx % 2 === 0 ? "" : "bg-[#16161f]/50"
+                  className={`group border-b border-white/[0.03] hover:bg-[var(--surface-hover)] transition-colors ${
+                    idx % 2 === 0 ? "" : "bg-[var(--surface)]/50"
                   }`}
                 >
                   <td
-  className="px-4 py-3.5 font-medium text-white flex items-center gap-2 cursor-pointer"
+  className="px-4 py-3.5 font-medium text-[var(--color-white)] flex items-center gap-2 cursor-pointer"
   onClick={() => setSelectedShop(o.shopSlug.toLowerCase())}
 >
   <Image
@@ -203,27 +203,27 @@ export function OrdersTable({
   </span>
 </td>
 
-                  <td className="px-4 py-3.5 font-mono text-xs text-[#8080a0]">
+                  <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-3)]">
                     {o.orderNumber || "—"}
                   </td>
 
-                  <td className="px-4 py-3.5 text-[#8080a0]">
+                  <td className="px-4 py-3.5 text-[var(--text-3)]">
                     {o.carrier || "—"}
                   </td>
 
-                  <td className="px-4 py-3.5 font-mono text-xs text-[#6b6b80]">
+                  <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-4)]">
                     {o.trackingNumber || "—"}
                   </td>
 
-                  <td className="px-4 py-3.5 text-right text-[#8080a0]">
+                  <td className="px-4 py-3.5 text-right text-[var(--text-3)]">
                     {o.items}
                   </td>
 
-                  <td className="px-4 py-3.5 text-right font-semibold text-white">
+                  <td className="px-4 py-3.5 text-right font-semibold text-[var(--color-white)]">
                     {fmt(o.amount)}
                   </td>
 
-                  <td className="px-4 py-3.5 text-[#6b6b80] text-xs">
+                  <td className="px-4 py-3.5 text-[var(--text-4)] text-xs">
                     {fmtDate(o.paymentDate)}
                   </td>
 
@@ -233,12 +233,12 @@ export function OrdersTable({
                   </td>
 
                   {/* ───── TECH ───── */}
-                  <td className="px-4 py-3.5 text-[#8080a0] text-xs">
+                  <td className="px-4 py-3.5 text-[var(--text-3)] text-xs">
                     {o.tech || "—"}
                   </td>
 
                   {/* ───── NOTE ───── */}
-                  <td className="px-4 py-3.5 text-[#6b6b80] text-xs max-w-[160px]">
+                  <td className="px-4 py-3.5 text-[var(--text-4)] text-xs max-w-[160px]">
                     {o.note ? (
                       <span title={o.note}>
                         {o.note.length > 20
@@ -287,7 +287,7 @@ export function OrdersTable({
           <div
             ref={dropdownRef}
             style={{ top: menuPos.top, left: menuPos.left }}
-            className="fixed w-44 max-h-[60vh] overflow-y-auto bg-[#1a1a2e] border border-white/10 rounded-xl z-50 py-1 shadow-xl shadow-black/40"
+            className="fixed w-44 max-h-[60vh] overflow-y-auto bg-[var(--dropdown-bg)] border border-white/10 rounded-xl z-50 py-1 shadow-xl shadow-black/40"
           >
             {STATUS_LIST.map((s) => (
               <button
@@ -319,7 +319,7 @@ function Th({
 }) {
   return (
     <th
-      className={`px-4 py-3 text-xs text-[#4a4a60] uppercase ${
+      className={`px-4 py-3 text-xs text-[var(--text-5)] uppercase ${
         align === "right" ? "text-right" : "text-left"
       }`}
     >
@@ -344,7 +344,7 @@ function ActionBtn({
       className={`w-7 h-7 rounded-lg flex items-center justify-center ${
         danger
           ? "text-red-400 hover:bg-red-400/10"
-          : "text-[#4a4a60] hover:text-white hover:bg-white/5"
+          : "text-[var(--text-5)] hover:text-[var(--color-white)] hover:bg-white/5"
       }`}
     >
       ⋯

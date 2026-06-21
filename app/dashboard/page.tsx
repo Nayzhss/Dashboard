@@ -102,7 +102,7 @@ export default function DashboardPage() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <main className="min-h-screen bg-[#0b0b10] text-white">
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
       <Header />
 
       {/* Content */}
@@ -110,14 +110,14 @@ export default function DashboardPage() {
         {/* Page title */}
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-white tracking-tight">
+            <h1 className="text-2xl font-semibold text-[var(--color-white)] tracking-tight">
               Dashboard
             </h1>
-            <p className="text-sm text-[#4a4a60] mt-1">
+            <p className="text-sm text-[var(--text-5)] mt-1">
               Suivi et gestion des remboursements
             </p>
           </div>
-          <span className="text-xs text-[#3a3a50]">
+          <span className="text-xs text-[var(--text-6)]">
             {orders.length} commande{orders.length !== 1 ? "s" : ""}
           </span>
         </div>

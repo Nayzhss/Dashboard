@@ -16,7 +16,7 @@ function highlight(name: string, query: string) {
   return (
     <>
       {name.slice(0, idx)}
-      <span className="text-violet-300">{name.slice(idx, idx + query.length)}</span>
+      <span className="text-[var(--accent-300)]">{name.slice(idx, idx + query.length)}</span>
       {name.slice(idx + query.length)}
     </>
   )
@@ -52,7 +52,7 @@ export function ShopSearch({ shops, onSelect }: Props) {
   return (
     <div ref={containerRef} className="relative w-full sm:max-w-sm">
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4a4a60]"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-5)]"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -74,11 +74,11 @@ export function ShopSearch({ shops, onSelect }: Props) {
         }}
         onFocus={() => setOpen(true)}
         placeholder="Rechercher une boutique…"
-        className="w-full pl-9 pr-3 py-2 bg-[#16161f] border border-white/5 rounded-xl text-sm text-white placeholder:text-[#4a4a60] focus:outline-none focus:border-violet-500/50 transition-colors"
+        className="w-full pl-9 pr-3 py-2 bg-[var(--surface)] border border-white/5 rounded-xl text-sm text-[var(--color-white)] placeholder:text-[var(--text-5)] focus:outline-none focus:border-[var(--accent-500)]/50 transition-colors"
       />
 
       {open && suggestions.length > 0 && (
-        <div className="absolute left-0 right-0 mt-1.5 bg-[#16161f] border border-white/10 rounded-xl shadow-xl shadow-black/40 overflow-hidden z-50">
+        <div className="absolute left-0 right-0 mt-1.5 bg-[var(--surface)] border border-white/10 rounded-xl shadow-xl shadow-black/40 overflow-hidden z-50">
           {suggestions.map((shop) => (
             <button
               key={shop.slug}
@@ -92,7 +92,7 @@ export function ShopSearch({ shops, onSelect }: Props) {
                 height={28}
                 className="rounded-md shrink-0"
               />
-              <span className="text-sm text-white truncate">
+              <span className="text-sm text-[var(--color-white)] truncate">
                 {highlight(shop.name, query)}
               </span>
             </button>

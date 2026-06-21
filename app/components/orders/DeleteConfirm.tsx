@@ -26,7 +26,7 @@ export function DeleteConfirm({ shopName, onConfirm, onCancel }: Props) {
       onClick={onCancel}
     >
       <div
-        className="bg-[#16161f] border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+        className="bg-[var(--surface)] border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 mb-4">
@@ -36,19 +36,19 @@ export function DeleteConfirm({ shopName, onConfirm, onCancel }: Props) {
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-white">Supprimer la commande</h3>
-            <p className="text-xs text-[#6b6b80] mt-0.5">{shopName}</p>
+            <h3 className="font-semibold text-[var(--color-white)]">Supprimer la commande</h3>
+            <p className="text-xs text-[var(--text-4)] mt-0.5">{shopName}</p>
           </div>
         </div>
 
-        <p className="text-sm text-[#8080a0] mb-6">
+        <p className="text-sm text-[var(--text-3)] mb-6">
           Cette action est irréversible. La commande sera définitivement supprimée.
         </p>
 
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[#8080a0] hover:text-white hover:border-white/20 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[var(--text-3)] hover:text-[var(--color-white)] hover:border-white/20 transition-colors"
           >
             Annuler
           </button>

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { LogoutButton } from "./LogoutButton"
+import { ThemeToggle } from "./ThemeToggle"
 
 const NAV_LINKS = [
   { href: "/", label: "Boutiques" },
@@ -12,7 +13,7 @@ export function Header() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0b0b10]/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-[var(--bg)]/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5 shrink-0">
           <img
@@ -20,7 +21,7 @@ export function Header() {
             alt=""
             className="w-6 h-6 rounded-md"
           />
-          <span className="font-semibold text-sm text-white hidden sm:inline">
+          <span className="font-semibold text-sm text-[var(--color-white)] hidden sm:inline">
             OPENRF Community
           </span>
         </div>
@@ -34,8 +35,8 @@ export function Header() {
                 href={link.href}
                 className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   active
-                    ? "bg-violet-500/10 text-violet-300"
-                    : "text-[#8080a0] hover:text-white hover:bg-white/5"
+                    ? "bg-[var(--accent-500)]/10 text-[var(--accent-300)]"
+                    : "text-[var(--text-3)] hover:text-[var(--color-white)] hover:bg-white/5"
                 }`}
               >
                 {link.label}
@@ -44,7 +45,8 @@ export function Header() {
           })}
         </nav>
 
-        <div className="shrink-0">
+        <div className="shrink-0 flex items-center gap-2">
+          <ThemeToggle />
           <LogoutButton />
         </div>
       </div>

@@ -34,7 +34,7 @@ export function PasswordInput({
         type="button"
         onClick={() => setVisible((v) => !v)}
         tabIndex={-1}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6b6b80] hover:text-white transition-colors"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-4)] hover:text-[var(--color-white)] transition-colors"
         aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
       >
         {visible ? (
