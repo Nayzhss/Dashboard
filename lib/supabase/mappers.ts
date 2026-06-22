@@ -17,6 +17,10 @@ export interface OrderRow {
   note: string | null
   frozen_delay: number | null
   delivered_at: string | null
+  return_carrier: string | null
+  return_tracking_number: string | null
+  return_shipped_at: string | null
+  return_frozen_delay: number | null
 }
 
 export function rowToOrder(row: OrderRow): Order {
@@ -35,6 +39,10 @@ export function rowToOrder(row: OrderRow): Order {
     note: row.note ?? undefined,
     frozenDelay: row.frozen_delay ?? undefined,
     deliveredAt: row.delivered_at ?? undefined,
+    returnCarrier: row.return_carrier ?? undefined,
+    returnTrackingNumber: row.return_tracking_number ?? undefined,
+    returnShippedAt: row.return_shipped_at ?? undefined,
+    returnFrozenDelay: row.return_frozen_delay ?? undefined,
   }
 }
 
@@ -54,6 +62,10 @@ export function orderToRow(data: Partial<Order>): Partial<OrderRow> {
   if (data.note !== undefined) row.note = data.note || null
   if (data.frozenDelay !== undefined) row.frozen_delay = data.frozenDelay
   if (data.deliveredAt !== undefined) row.delivered_at = data.deliveredAt || null
+  if (data.returnCarrier !== undefined) row.return_carrier = data.returnCarrier || null
+  if (data.returnTrackingNumber !== undefined) row.return_tracking_number = data.returnTrackingNumber || null
+  if (data.returnShippedAt !== undefined) row.return_shipped_at = data.returnShippedAt || null
+  if (data.returnFrozenDelay !== undefined) row.return_frozen_delay = data.returnFrozenDelay
 
   return row
 }

@@ -31,6 +31,12 @@ export interface Order {
   frozenDelay?: number
 
   deliveredAt?: string
+
+  returnCarrier?: string
+  returnTrackingNumber?: string
+  returnShippedAt?: string
+  // délai retour figé quand commande remboursée ou fail
+  returnFrozenDelay?: number
 }
 
 export interface OrderFormData {

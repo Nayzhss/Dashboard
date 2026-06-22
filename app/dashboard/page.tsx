@@ -99,6 +99,25 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleMarkReturn(
+    id: string,
+    returnCarrier: string,
+    returnTrackingNumber: string
+  ) {
+    try {
+      await updateOrder(id, {
+        status: "Retour",
+        returnCarrier,
+        returnTrackingNumber,
+        returnShippedAt: new Date().toISOString().slice(0, 10),
+      })
+      addToast("Retour enregistré", "success")
+    } catch {
+      addToast("Erreur lors de l'enregistrement du retour", "error")
+      throw new Error()
+    }
+  }
+
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -147,6 +166,7 @@ export default function DashboardPage() {
           onDelete={(order) => setModal({ type: "delete", order })}
           onDuplicate={handleDuplicate}
           onStatusChange={handleStatusChange}
+          onMarkReturn={handleMarkReturn}
         />
       </div>
 

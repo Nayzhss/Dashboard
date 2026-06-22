@@ -9,6 +9,7 @@ import { useShops } from "../../hooks/useShops"
 import { getCarrier } from "../../data/carriers"
 import type { Order, Status } from "./types"
 import { ShopModal } from "../shops/ShopModal"
+import { ReturnModal } from "./ReturnModal"
 
 interface Props {
   orders: Order[]
@@ -17,6 +18,7 @@ interface Props {
   onDelete: (order: Order) => void
   onDuplicate: (order: Order) => void
   onStatusChange: (id: string, status: Status) => Promise<void>
+  onMarkReturn: (id: string, carrier: string, trackingNumber: string) => Promise<void>
 }
 
 /* ───────── utils ───────── */
@@ -64,6 +66,25 @@ function getDelay(
 }
 
 /**
+ * Délai retour = jours depuis returnShippedAt, figé sur returnFrozenDelay une fois remboursée/fail
+ */
+function getReturnDelay(
+  returnShippedAt: string | undefined,
+  status: Status,
+  returnFrozenDelay?: number
+) {
+  if (!returnShippedAt) return null
+
+  const start = new Date(returnShippedAt).getTime()
+
+  if (status === "Remboursée" || status === "Fail") {
+    return returnFrozenDelay ?? 0
+  }
+
+  return Math.max(0, Math.floor((Date.now() - start) / 86400000))
+}
+
+/**
  * couleur du délai type SaaS
  */
 function getDelayColor(days: number) {
@@ -81,11 +102,13 @@ export function OrdersTable({
   onDelete,
   onDuplicate,
   onStatusChange,
+  onMarkReturn,
 }: Props) {
   const { getShop } = useShops()
   const [statusMenu, setStatusMenu] = useState<string | null>(null)
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
   const [selectedShop, setSelectedShop] = useState<string | null>(null)
+  const [returnModalOrderId, setReturnModalOrderId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -181,6 +204,9 @@ export function OrdersTable({
               <Th>Tech</Th>
               <Th>Note</Th>
               <Th>Statut</Th>
+              <Th>Transp. retour</Th>
+              <Th>Suivi retour</Th>
+              <Th>Délai retour</Th>
               <Th align="right">Actions</Th>
             </tr>
           </thead>
@@ -190,6 +216,8 @@ export function OrdersTable({
               const shop = getShop(o.shopSlug.toLowerCase())
               const carrier = getCarrier(o.carrier)
               const delay = getDelay(o.paymentDate, o.status, o.frozenDelay, o.deliveredAt)
+              const returnCarrier = o.returnCarrier ? getCarrier(o.returnCarrier) : undefined
+              const returnDelay = getReturnDelay(o.returnShippedAt, o.status, o.returnFrozenDelay)
 
               return (
                 <tr
@@ -301,6 +329,57 @@ export function OrdersTable({
                     </button>
                   </td>
 
+                  {/* ───── RETOUR ───── */}
+                  <td className="px-4 py-3.5 text-[var(--text-3)]">
+                    {o.returnCarrier ? (
+                      returnCarrier ? (
+                        <span className="flex items-center gap-2" title={returnCarrier.name}>
+                          <Image
+                            src={`/carriers/${returnCarrier.slug}.png`}
+                            alt={returnCarrier.name}
+                            width={20}
+                            height={20}
+                            className="rounded shrink-0"
+                          />
+                          <span className="sr-only">{returnCarrier.name}</span>
+                        </span>
+                      ) : (
+                        o.returnCarrier
+                      )
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+
+                  <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-4)]">
+                    {o.returnTrackingNumber ? (
+                      returnCarrier ? (
+                        <a
+                          href={returnCarrier.trackingUrl(o.returnTrackingNumber)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline hover:text-[var(--accent-300)]"
+                        >
+                          {o.returnTrackingNumber}
+                        </a>
+                      ) : (
+                        o.returnTrackingNumber
+                      )
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+
+                  <td
+                    className={
+                      returnDelay === null
+                        ? "px-4 py-3.5 text-[var(--text-5)]"
+                        : `px-4 py-3.5 font-semibold ${getDelayColor(returnDelay)}`
+                    }
+                  >
+                    {returnDelay === null ? "—" : `${returnDelay}j`}
+                  </td>
+
                   {/* ACTIONS */}
                   <td className="px-4 py-3.5 text-right">
                     <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition">
@@ -325,6 +404,14 @@ export function OrdersTable({
     onClose={() => setSelectedShop(null)}
   />
 )}
+      {returnModalOrderId && (
+        <ReturnModal
+          onConfirm={(carrier, trackingNumber) =>
+            onMarkReturn(returnModalOrderId, carrier, trackingNumber)
+          }
+          onClose={() => setReturnModalOrderId(null)}
+        />
+      )}
       {statusMenu &&
         menuPos &&
         createPortal(
@@ -337,6 +424,11 @@ export function OrdersTable({
               <button
                 key={s}
                 onClick={async () => {
+                  if (s === "Retour") {
+                    setReturnModalOrderId(statusMenu)
+                    setStatusMenu(null)
+                    return
+                  }
                   await onStatusChange(statusMenu, s)
                   setStatusMenu(null)
                 }}

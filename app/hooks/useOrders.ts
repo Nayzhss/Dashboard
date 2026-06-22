@@ -88,6 +88,26 @@ export function useOrders() {
     )
   }
 
+  function getReturnDelay(order: Order) {
+    if (!order.returnShippedAt) return 0
+
+    if (
+      order.status === "Remboursée" ||
+      order.status === "Fail"
+    ) {
+      return order.returnFrozenDelay ?? 0
+    }
+
+    return Math.max(
+      0,
+      Math.floor(
+        (Date.now() -
+          new Date(order.returnShippedAt).getTime()) /
+          86400000
+      )
+    )
+  }
+
   // ─────────────────────────────────────────────
   // Create
   // ─────────────────────────────────────────────
@@ -150,6 +170,11 @@ export function useOrders() {
       ) {
         payload.frozenDelay =
           getDelay(current)
+
+        if (current.returnShippedAt) {
+          payload.returnFrozenDelay =
+            getReturnDelay(current)
+        }
       }
 
       const res = await fetch("/api/orders", {
