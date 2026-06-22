@@ -2,7 +2,8 @@
 import { useState } from "react"
 import Image from "next/image"
 import { useShops } from "../../hooks/useShops"
-import type { Shop } from "../../data/shops"
+import { SHOP_CATEGORY_LIST, SHOP_CATEGORY_CONFIG } from "../../data/shops"
+import type { Shop, ShopCategory } from "../../data/shops"
 
 interface Props {
   slug: string
@@ -19,6 +20,7 @@ function emptyForm(shop: Shop) {
     phone: shop.phone ?? "",
     mail: shop.mail ?? "",
     accountFresh: shop.accountFresh,
+    category: shop.category,
     notes: shop.notes ?? "",
     shippingDelivery: shop.shipping.delivery.join(", "),
     shippingReturn: shop.shipping.return.join(", "),
@@ -124,7 +126,12 @@ export function ShopModal({ slug, onClose }: Props) {
           />
           <div>
             <p className="text-[var(--color-white)] font-semibold">{shop.name}</p>
-            <p className="text-xs text-[var(--text-4)]">{shop.slug}</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="text-xs text-[var(--text-4)]">{shop.slug}</p>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-[var(--text-3)]">
+                {SHOP_CATEGORY_CONFIG[shop.category].emoji} {SHOP_CATEGORY_CONFIG[shop.category].label}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -166,6 +173,23 @@ export function ShopModal({ slug, onClose }: Props) {
                 />
               </label>
             </div>
+
+            <label className="block">
+              <span className="text-xs text-[var(--text-4)]">Catégorie</span>
+              <select
+                className={inputCls}
+                value={form.category}
+                onChange={(e) =>
+                  setForm({ ...form, category: e.target.value as ShopCategory })
+                }
+              >
+                {SHOP_CATEGORY_LIST.map((c) => (
+                  <option key={c} value={c}>
+                    {SHOP_CATEGORY_CONFIG[c].emoji} {SHOP_CATEGORY_CONFIG[c].label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <div className="grid grid-cols-2 gap-2.5">
               <label className="block">

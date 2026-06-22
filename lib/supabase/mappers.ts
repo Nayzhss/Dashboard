@@ -1,5 +1,5 @@
 import type { Order, OrderUpdateInput } from "@/app/components/orders/types"
-import type { Shop, MethodStats } from "@/app/data/shops"
+import type { Shop, MethodStats, ShopCategory } from "@/app/data/shops"
 
 export interface OrderRow {
   id: string
@@ -92,6 +92,7 @@ export interface ShopRow {
   phone: string | null
   mail: string | null
   account_fresh: boolean
+  category: ShopCategory
   notes: string | null
   shipping_delivery: string[]
   shipping_return: string[]
@@ -117,6 +118,7 @@ export function rowToShop(row: ShopRow): Shop {
     phone: row.phone ?? undefined,
     mail: row.mail ?? undefined,
     accountFresh: row.account_fresh,
+    category: row.category,
     notes: row.notes ?? undefined,
     methods: (row.shop_methods ?? []).map(rowToMethod),
     shipping: {

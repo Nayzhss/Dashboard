@@ -21,6 +21,7 @@ export async function PATCH(
   if (body.phone !== undefined) update.phone = body.phone || null
   if (body.mail !== undefined) update.mail = body.mail || null
   if (body.accountFresh !== undefined) update.account_fresh = body.accountFresh
+  if (body.category !== undefined) update.category = body.category
   if (body.notes !== undefined) update.notes = body.notes || null
   if (body.shippingDelivery !== undefined) update.shipping_delivery = body.shippingDelivery
   if (body.shippingReturn !== undefined) update.shipping_return = body.shippingReturn

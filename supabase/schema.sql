@@ -22,6 +22,10 @@ create table if not exists shops (
   created_at timestamptz not null default now()
 );
 
+-- domaine d'activité de la boutique (mode, sport, tech...), voir
+-- app/data/shops.ts > SHOP_CATEGORY_CONFIG pour les valeurs valides
+alter table shops add column if not exists category text not null default 'autre';
+
 create table if not exists shop_methods (
   id uuid primary key default gen_random_uuid(),
   shop_id uuid not null references shops(id) on delete cascade,
