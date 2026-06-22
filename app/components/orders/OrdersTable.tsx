@@ -67,16 +67,19 @@ function getDelay(
 }
 
 /**
- * Délai retour = jours depuis returnShippedAt, figé sur returnFrozenDelay une fois remboursée/fail
+ * Délai retour = jours depuis le dépôt réel du colis (returnDroppedAt si connu,
+ * sinon returnShippedAt), figé sur returnFrozenDelay une fois remboursée/fail
  */
 function getReturnDelay(
   returnShippedAt: string | undefined,
   status: Status,
-  returnFrozenDelay?: number
+  returnFrozenDelay?: number,
+  returnDroppedAt?: string
 ) {
-  if (!returnShippedAt) return null
+  const startDate = returnDroppedAt || returnShippedAt
+  if (!startDate) return null
 
-  const start = new Date(returnShippedAt).getTime()
+  const start = new Date(startDate).getTime()
 
   if (status === "Remboursée" || status === "Fail") {
     return returnFrozenDelay ?? 0
@@ -193,7 +196,12 @@ export function OrdersTable({
       {orders.map((o, idx) => {
         const shop = getShop(o.shopSlug)
         const delay = getDelay(o.paymentDate, o.status, o.frozenDelay, o.deliveredAt)
-        const returnDelay = getReturnDelay(o.returnShippedAt, o.status, o.returnFrozenDelay)
+        const returnDelay = getReturnDelay(
+          o.returnShippedAt,
+          o.status,
+          o.returnFrozenDelay,
+          o.returnDroppedAt
+        )
         const accountCfg = o.accountType ? ACCOUNT_TYPE_CONFIG[o.accountType] : undefined
         const deliveryCfg = o.deliveryType ? DELIVERY_TYPE_CONFIG[o.deliveryType] : undefined
 
@@ -302,10 +310,10 @@ export function OrdersTable({
             </div>
 
             {/* RETOUR */}
-            {o.returnCarrier && (
+            {(o.returnCarrier || o.returnTrackingNumber || o.returnDroppedAt) && (
               <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
                 <span className="text-[var(--text-5)] font-medium shrink-0">↩ Retour</span>
-                <CarrierTrack carrierRaw={o.returnCarrier} tracking={o.returnTrackingNumber ?? ""} />
+                <CarrierTrack carrierRaw={o.returnCarrier ?? ""} tracking={o.returnTrackingNumber ?? ""} />
                 <span
                   className={
                     returnDelay === null
@@ -315,6 +323,11 @@ export function OrdersTable({
                 >
                   {returnDelay === null ? "—" : `${returnDelay}j de retour`}
                 </span>
+                {o.returnDroppedAt && (
+                  <span className="text-[var(--text-5)]">
+                    déposé le {fmtDate(o.returnDroppedAt)}
+                  </span>
+                )}
               </div>
             )}
 

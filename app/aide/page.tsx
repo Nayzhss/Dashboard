@@ -91,9 +91,16 @@ export default function AidePage() {
               normalement, sans rien y changer.
             </p>
             <p>
+              Le transporteur, le numéro de suivi et la « Date de dépôt retour »
+              peuvent être laissés vides à ce moment-là, puis complétés plus
+              tard en modifiant la commande (icône ✏️ Modifier).
+            </p>
+            <p>
               Le « Délai retour » s'incrémente d'un jour chaque jour à partir de
-              l'expédition du retour, et se fige (comme le délai normal) une
-              fois la commande marquée Remboursée ou Fail.
+              la date de dépôt du colis retour (récupérée automatiquement via
+              le suivi 17Track une fois disponible, sinon renseignée à la
+              main), et se fige (comme le délai normal) une fois la commande
+              marquée Remboursée ou Fail.
             </p>
           </Section>
 

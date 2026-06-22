@@ -41,6 +41,8 @@ export interface Order {
   returnCarrier?: string
   returnTrackingNumber?: string
   returnShippedAt?: string
+  // date réelle de dépôt du colis retour, auto (17Track) ou manuelle
+  returnDroppedAt?: string
   // délai retour figé quand commande remboursée ou fail
   returnFrozenDelay?: number
 }
@@ -68,6 +70,10 @@ export interface OrderFormData {
 
   accountType: AccountType | ""
   deliveryType: DeliveryType | ""
+
+  returnCarrier: string
+  returnTrackingNumber: string
+  returnDroppedAt: string
 
   deliveredAt: string
 }
@@ -192,6 +198,10 @@ export const EMPTY_FORM: OrderFormData = {
 
   accountType: "",
   deliveryType: "",
+
+  returnCarrier: "",
+  returnTrackingNumber: "",
+  returnDroppedAt: "",
 
   deliveredAt: "",
 }

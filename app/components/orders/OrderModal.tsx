@@ -32,6 +32,11 @@ export function OrderModal({
   const [loading, setLoading] =
     useState(false)
 
+  const showReturnSection =
+    mode === "edit" &&
+    !!order &&
+    (order.status === "Retour" || !!order.returnCarrier || form.status === "Retour")
+
   useEffect(() => {
     if (mode === "edit" && order) {
       setForm({
@@ -50,6 +55,10 @@ export function OrderModal({
 
         accountType: order.accountType ?? "",
         deliveryType: order.deliveryType ?? "",
+
+        returnCarrier: order.returnCarrier ?? "",
+        returnTrackingNumber: order.returnTrackingNumber ?? "",
+        returnDroppedAt: order.returnDroppedAt?.slice(0, 10) ?? "",
 
         deliveredAt: order.deliveredAt?.slice(0, 10) ?? "",
       })
@@ -301,6 +310,42 @@ export function OrderModal({
               ))}
             </select>
           </Field>
+
+          {showReturnSection && (
+            <div className="space-y-3 p-3 rounded-xl bg-[var(--input-bg)]/50 border border-white/5">
+              <p className="text-xs font-medium text-[var(--text-4)]">↩ Retour</p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Transp. retour">
+                  <CarrierInput
+                    value={form.returnCarrier}
+                    onChange={(value) => set("returnCarrier", value)}
+                    placeholder="DHL, Colissimo…"
+                    className={inputCls}
+                  />
+                </Field>
+
+                <Field label="Suivi retour">
+                  <input
+                    type="text"
+                    value={form.returnTrackingNumber}
+                    onChange={(e) => set("returnTrackingNumber", e.target.value)}
+                    placeholder="TRK123456"
+                    className={inputCls}
+                  />
+                </Field>
+              </div>
+
+              <Field label="Date de dépôt retour">
+                <input
+                  type="date"
+                  value={form.returnDroppedAt}
+                  onChange={(e) => set("returnDroppedAt", e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+            </div>
+          )}
 
           <Field label="Tech">
             <select

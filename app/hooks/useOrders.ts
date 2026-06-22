@@ -90,7 +90,8 @@ export function useOrders() {
   }
 
   function getReturnDelay(order: Order) {
-    if (!order.returnShippedAt) return 0
+    const startDate = order.returnDroppedAt || order.returnShippedAt
+    if (!startDate) return 0
 
     if (
       order.status === "Remboursée" ||
@@ -103,7 +104,7 @@ export function useOrders() {
       0,
       Math.floor(
         (Date.now() -
-          new Date(order.returnShippedAt).getTime()) /
+          new Date(startDate).getTime()) /
           86400000
       )
     )

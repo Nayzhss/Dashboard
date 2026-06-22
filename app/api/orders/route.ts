@@ -91,6 +91,7 @@ export async function PUT(req: NextRequest) {
 
   const row = data as OrderRow
   await maybeRegisterTracking(row.carrier, row.tracking_number)
+  await maybeRegisterTracking(row.return_carrier ?? undefined, row.return_tracking_number ?? undefined)
 
   return NextResponse.json(rowToOrder(row))
 }

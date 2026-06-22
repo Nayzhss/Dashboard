@@ -42,6 +42,7 @@ export function ReturnModal({ onConfirm, onClose }: Props) {
         </h2>
         <p className="text-xs text-[var(--text-4)] mb-5">
           Renseigne le transporteur du retour pour suivre le colis et calculer son délai.
+          Tu peux laisser ces champs vides et les compléter plus tard depuis l'édition.
         </p>
 
         <div className="space-y-3">
@@ -77,7 +78,7 @@ export function ReturnModal({ onConfirm, onClose }: Props) {
 
           <button
             onClick={handleConfirm}
-            disabled={loading || !carrier || !trackingNumber}
+            disabled={loading}
             className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--accent-600)] hover:bg-[var(--accent-500)] disabled:opacity-40 text-sm font-medium text-[#fff] transition-colors"
           >
             {loading ? "Confirmation…" : "Confirmer"}

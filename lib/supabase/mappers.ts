@@ -20,6 +20,7 @@ export interface OrderRow {
   return_carrier: string | null
   return_tracking_number: string | null
   return_shipped_at: string | null
+  return_dropped_at: string | null
   return_frozen_delay: number | null
   account_type: Order["accountType"] | null
   delivery_type: Order["deliveryType"] | null
@@ -44,6 +45,7 @@ export function rowToOrder(row: OrderRow): Order {
     returnCarrier: row.return_carrier ?? undefined,
     returnTrackingNumber: row.return_tracking_number ?? undefined,
     returnShippedAt: row.return_shipped_at ?? undefined,
+    returnDroppedAt: row.return_dropped_at ?? undefined,
     returnFrozenDelay: row.return_frozen_delay ?? undefined,
     accountType: row.account_type ?? undefined,
     deliveryType: row.delivery_type ?? undefined,
@@ -69,6 +71,7 @@ export function orderToRow(data: OrderUpdateInput): Partial<OrderRow> {
   if (data.returnCarrier !== undefined) row.return_carrier = data.returnCarrier || null
   if (data.returnTrackingNumber !== undefined) row.return_tracking_number = data.returnTrackingNumber || null
   if (data.returnShippedAt !== undefined) row.return_shipped_at = data.returnShippedAt || null
+  if (data.returnDroppedAt !== undefined) row.return_dropped_at = data.returnDroppedAt || null
   if (data.returnFrozenDelay !== undefined) row.return_frozen_delay = data.returnFrozenDelay
   if (data.accountType !== undefined) row.account_type = data.accountType || null
   if (data.deliveryType !== undefined) row.delivery_type = data.deliveryType || null

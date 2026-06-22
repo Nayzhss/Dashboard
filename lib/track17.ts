@@ -36,6 +36,9 @@ export interface TrackInfoResult {
   carrier: number
   delivered: boolean
   deliveredAt: string | null
+  // date à laquelle le colis a été remis au transporteur (étape "PickedUp"
+  // du milestone 17Track), utile pour la date de dépôt d'un colis retour
+  pickedUpAt: string | null
 }
 
 export async function getTrackInfo(items: RegisterItem[]): Promise<TrackInfoResult[]> {
@@ -56,10 +59,12 @@ export async function getTrackInfo(items: RegisterItem[]): Promise<TrackInfoResu
     track_info?: {
       latest_status?: { status?: string }
       latest_event?: { time_iso?: string }
+      milestone?: Array<{ key_stage?: string; time_iso?: string | null }>
     }
   }) => {
     const status = item.track_info?.latest_status?.status
     const delivered = status === "Delivered"
+    const pickedUp = item.track_info?.milestone?.find((m) => m.key_stage === "PickedUp")
 
     return {
       number: item.number,
@@ -68,6 +73,7 @@ export async function getTrackInfo(items: RegisterItem[]): Promise<TrackInfoResu
       deliveredAt: delivered
         ? item.track_info?.latest_event?.time_iso ?? null
         : null,
+      pickedUpAt: pickedUp?.time_iso ?? null,
     }
   })
 }
