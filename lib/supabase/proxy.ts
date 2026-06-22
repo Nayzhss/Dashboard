@@ -6,6 +6,7 @@ const PUBLIC_API_PATHS = [
   "/api/auth/check-username",
   "/api/auth/resolve-username",
   "/api/backup",
+  "/api/cron/check-deliveries",
 ]
 
 export async function updateSession(request: NextRequest) {

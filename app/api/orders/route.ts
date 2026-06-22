@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { rowToOrder, orderToRow, type OrderRow } from "@/lib/supabase/mappers"
+import { getCarrier } from "@/app/data/carriers"
+import { registerTracking } from "@/lib/track17"
 import type { OrderFormData } from "@/app/components/orders/types"
+
+async function maybeRegisterTracking(carrierName?: string, trackingNumber?: string) {
+  if (!carrierName || !trackingNumber) return
+
+  const carrier = getCarrier(carrierName)
+  if (!carrier) return
+
+  try {
+    await registerTracking([{ number: trackingNumber, carrier: carrier.track17Code }])
+  } catch {
+    // best-effort: a failed registration shouldn't break order creation/update
+  }
+}
 
 export async function GET() {
   const supabase = await createClient()
@@ -43,6 +58,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  await maybeRegisterTracking(body.carrier, body.trackingNumber)
+
   return NextResponse.json(rowToOrder(data as OrderRow), { status: 201 })
 }
 
@@ -72,7 +89,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 })
   }
 
-  return NextResponse.json(rowToOrder(data as OrderRow))
+  const row = data as OrderRow
+  await maybeRegisterTracking(row.carrier, row.tracking_number)
+
+  return NextResponse.json(rowToOrder(row))
 }
 
 export async function DELETE(req: NextRequest) {

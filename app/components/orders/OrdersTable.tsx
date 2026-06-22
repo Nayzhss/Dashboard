@@ -40,14 +40,24 @@ function fmtDate(d: string) {
 /**
  * Délai = jours depuis paymentDate, figé sur frozenDelay une fois remboursée/fail
  */
-function getDelay(paymentDate: string, status: Status, frozenDelay?: number) {
+function getDelay(
+  paymentDate: string,
+  status: Status,
+  frozenDelay?: number,
+  deliveredAt?: string
+) {
+  if (!paymentDate) return 0
+
+  const start = new Date(paymentDate).getTime()
+
+  if (deliveredAt) {
+    return Math.max(0, Math.floor((new Date(deliveredAt).getTime() - start) / 86400000))
+  }
+
   if (status === "Remboursée" || status === "Fail") {
     return frozenDelay ?? 0
   }
 
-  if (!paymentDate) return 0
-
-  const start = new Date(paymentDate).getTime()
   const end = new Date().getTime()
 
   return Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)))
@@ -179,7 +189,7 @@ export function OrdersTable({
             {orders.map((o, idx) => {
               const shop = getShop(o.shopSlug.toLowerCase())
               const carrier = getCarrier(o.carrier)
-              const delay = getDelay(o.paymentDate, o.status, o.frozenDelay)
+              const delay = getDelay(o.paymentDate, o.status, o.frozenDelay, o.deliveredAt)
 
               return (
                 <tr

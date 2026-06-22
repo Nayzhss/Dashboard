@@ -58,14 +58,25 @@ export function useOrders() {
   // ─────────────────────────────────────────────
 
   function getDelay(order: Order) {
+    if (!order.paymentDate) return 0
+
+    if (order.deliveredAt) {
+      return Math.max(
+        0,
+        Math.floor(
+          (new Date(order.deliveredAt).getTime() -
+            new Date(order.paymentDate).getTime()) /
+            86400000
+        )
+      )
+    }
+
     if (
       order.status === "Remboursée" ||
       order.status === "Fail"
     ) {
       return order.frozenDelay ?? 0
     }
-
-    if (!order.paymentDate) return 0
 
     return Math.max(
       0,

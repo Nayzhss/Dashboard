@@ -45,6 +45,8 @@ export function OrderModal({
 
         tech: order.tech ?? "",
         note: order.note ?? "",
+
+        deliveredAt: order.deliveredAt?.slice(0, 10) ?? "",
       })
     }
   }, [mode, order])
@@ -222,6 +224,20 @@ export function OrderModal({
               />
             </Field>
           </div>
+
+          <Field label="Date de réception">
+            <input
+              type="date"
+              value={form.deliveredAt}
+              onChange={(e) =>
+                set(
+                  "deliveredAt",
+                  e.target.value
+                )
+              }
+              className={inputCls}
+            />
+          </Field>
 
           <Field label="Statut">
             <select

@@ -46,6 +46,8 @@ export interface OrderFormData {
 
   tech: string
   note: string
+
+  deliveredAt: string
 }
 
 export interface Filters {
@@ -155,4 +157,6 @@ export const EMPTY_FORM: OrderFormData = {
 
   tech: "",
   note: "",
+
+  deliveredAt: "",
 }
