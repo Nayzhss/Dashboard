@@ -64,6 +64,10 @@ alter table orders add column if not exists return_tracking_number text;
 alter table orders add column if not exists return_shipped_at date;
 alter table orders add column if not exists return_frozen_delay int;
 
+-- compte utilisé pour la commande (fresh/old) et mode de livraison (domicile/relais)
+alter table orders add column if not exists account_type text;
+alter table orders add column if not exists delivery_type text;
+
 -- shop_slug has no FK: orders can reference shop names not yet in `shops`
 -- (this also retroactively removes the constraint if it was created by an older
 -- version of this file run against this database)

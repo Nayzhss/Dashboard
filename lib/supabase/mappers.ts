@@ -1,4 +1,4 @@
-import type { Order } from "@/app/components/orders/types"
+import type { Order, OrderUpdateInput } from "@/app/components/orders/types"
 import type { Shop, MethodStats } from "@/app/data/shops"
 
 export interface OrderRow {
@@ -21,6 +21,8 @@ export interface OrderRow {
   return_tracking_number: string | null
   return_shipped_at: string | null
   return_frozen_delay: number | null
+  account_type: Order["accountType"] | null
+  delivery_type: Order["deliveryType"] | null
 }
 
 export function rowToOrder(row: OrderRow): Order {
@@ -43,10 +45,12 @@ export function rowToOrder(row: OrderRow): Order {
     returnTrackingNumber: row.return_tracking_number ?? undefined,
     returnShippedAt: row.return_shipped_at ?? undefined,
     returnFrozenDelay: row.return_frozen_delay ?? undefined,
+    accountType: row.account_type ?? undefined,
+    deliveryType: row.delivery_type ?? undefined,
   }
 }
 
-export function orderToRow(data: Partial<Order>): Partial<OrderRow> {
+export function orderToRow(data: OrderUpdateInput): Partial<OrderRow> {
   const row: Partial<OrderRow> = {}
 
   if (data.shopSlug !== undefined) row.shop_slug = data.shopSlug
@@ -66,6 +70,8 @@ export function orderToRow(data: Partial<Order>): Partial<OrderRow> {
   if (data.returnTrackingNumber !== undefined) row.return_tracking_number = data.returnTrackingNumber || null
   if (data.returnShippedAt !== undefined) row.return_shipped_at = data.returnShippedAt || null
   if (data.returnFrozenDelay !== undefined) row.return_frozen_delay = data.returnFrozenDelay
+  if (data.accountType !== undefined) row.account_type = data.accountType || null
+  if (data.deliveryType !== undefined) row.delivery_type = data.deliveryType || null
 
   return row
 }

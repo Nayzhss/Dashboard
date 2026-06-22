@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import Image from "next/image"
 import { StatusBadge } from "./StatusBadge"
-import { STATUS_LIST } from "./types"
+import { STATUS_LIST, ACCOUNT_TYPE_CONFIG, DELIVERY_TYPE_CONFIG } from "./types"
 import { useShops } from "../../hooks/useShops"
 import { getCarrier } from "../../data/carriers"
+import { slugify } from "../../../lib/slugify"
 import type { Order, Status } from "./types"
 import { ShopModal } from "../shops/ShopModal"
 import { ReturnModal } from "./ReturnModal"
@@ -109,23 +110,24 @@ export function OrdersTable({
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
   const [selectedShop, setSelectedShop] = useState<string | null>(null)
   const [returnModalOrderId, setReturnModalOrderId] = useState<string | null>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const [actionsMenuId, setActionsMenuId] = useState<string | null>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const actionsMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handle(e: MouseEvent) {
       const target = e.target as Node
-      const insideTable = menuRef.current?.contains(target)
+      const insideWrapper = wrapperRef.current?.contains(target)
       const insideDropdown = dropdownRef.current?.contains(target)
-      if (!insideTable && !insideDropdown) {
-        setStatusMenu(null)
-      }
+      if (!insideWrapper && !insideDropdown) setStatusMenu(null)
+      if (!insideWrapper) setActionsMenuId(null)
     }
     document.addEventListener("mousedown", handle)
     return () => document.removeEventListener("mousedown", handle)
   }, [])
 
-  // ferme le menu si on scrolle (table ou page) pour éviter qu'il reste mal positionné
+  // ferme le menu statut si on scrolle pour éviter qu'il reste mal positionné
   useEffect(() => {
     if (!statusMenu) return
     function close() {
@@ -140,6 +142,7 @@ export function OrdersTable({
   }, [statusMenu])
 
   function toggleStatusMenu(orderId: string, e: React.MouseEvent<HTMLButtonElement>) {
+    setActionsMenuId(null)
     if (statusMenu === orderId) {
       setStatusMenu(null)
       return
@@ -160,11 +163,11 @@ export function OrdersTable({
 
   if (loading) {
     return (
-      <div className="space-y-2">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="h-14 bg-[var(--surface)] rounded-xl animate-pulse border border-white/5"
+            className="h-36 bg-[var(--surface)] rounded-2xl animate-pulse border border-white/5"
           />
         ))}
       </div>
@@ -183,227 +186,155 @@ export function OrdersTable({
     )
   }
 
-  /* ───────── table ───────── */
+  /* ───────── cards ───────── */
 
   return (
-    <div ref={menuRef} className="relative">
-      <div className="overflow-x-auto rounded-2xl border border-white/5">
-        <table className="w-full text-sm border-collapse">
+    <div ref={wrapperRef} className="relative flex flex-col gap-3">
+      {orders.map((o, idx) => {
+        const shop = getShop(o.shopSlug)
+        const delay = getDelay(o.paymentDate, o.status, o.frozenDelay, o.deliveredAt)
+        const returnDelay = getReturnDelay(o.returnShippedAt, o.status, o.returnFrozenDelay)
+        const accountCfg = o.accountType ? ACCOUNT_TYPE_CONFIG[o.accountType] : undefined
+        const deliveryCfg = o.deliveryType ? DELIVERY_TYPE_CONFIG[o.deliveryType] : undefined
 
-          {/* HEADER */}
-          <thead className="sticky top-0 z-10 bg-[var(--input-bg)]">
-            <tr className="border-b border-white/5">
-              <Th>Boutique</Th>
-              <Th>Commande</Th>
-              <Th>Transporteur</Th>
-              <Th>Suivi</Th>
-              <Th align="right">Articles</Th>
-              <Th align="right">Montant</Th>
-              <Th>Date paiement</Th>
-              <Th>Délai</Th>
-              <Th>Tech</Th>
-              <Th>Note</Th>
-              <Th>Statut</Th>
-              <Th>Transp. retour</Th>
-              <Th>Suivi retour</Th>
-              <Th>Délai retour</Th>
-              <Th align="right">Actions</Th>
-            </tr>
-          </thead>
-
-          <tbody className="bg-[var(--table-bg)]">
-            {orders.map((o, idx) => {
-              const shop = getShop(o.shopSlug)
-              const carrier = getCarrier(o.carrier)
-              const delay = getDelay(o.paymentDate, o.status, o.frozenDelay, o.deliveredAt)
-              const returnCarrier = o.returnCarrier ? getCarrier(o.returnCarrier) : undefined
-              const returnDelay = getReturnDelay(o.returnShippedAt, o.status, o.returnFrozenDelay)
-
-              return (
-                <tr
-                  key={o.id}
-                  className={`group border-b border-white/[0.03] hover:bg-[var(--surface-hover)] transition-colors ${
-                    idx % 2 === 0 ? "" : "bg-[var(--surface)]/50"
-                  }`}
-                >
-                  <td
-  className="px-4 py-3.5 font-medium text-[var(--color-white)] flex items-center gap-2 cursor-pointer"
-  onClick={() => setSelectedShop(o.shopSlug)}
->
-  <Image
-    src={`/logo/${o.shopSlug.toLowerCase()}.png`}
-    alt={shop?.name ?? o.shopSlug}
-    width={20}
-    height={20}
-    className="w-5 h-5 rounded"
-  />
-
-  <span className="hover:underline">
-    {shop?.name ?? o.shopSlug}
-  </span>
-</td>
-
-                  <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-3)]">
+        return (
+          <div
+            key={o.id}
+            className="animate-fade-up bg-[var(--surface)] border border-white/5 rounded-2xl p-4 sm:p-5 hover:border-white/10 transition-colors"
+            style={{ animationDelay: `${Math.min(idx * 40, 320)}ms` }}
+          >
+            {/* HEADER */}
+            <div className="flex items-start justify-between gap-3">
+              <button
+                onClick={() => setSelectedShop(o.shopSlug)}
+                className="flex items-center gap-2.5 min-w-0 text-left"
+              >
+                <Image
+                  src={`/logo/${slugify(o.shopSlug)}.png`}
+                  alt={shop?.name ?? o.shopSlug}
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 rounded-lg shrink-0 object-cover"
+                />
+                <div className="min-w-0">
+                  <p className="font-semibold text-[var(--color-white)] truncate hover:underline">
+                    {shop?.name ?? o.shopSlug}
+                  </p>
+                  <p className="text-xs text-[var(--text-5)] font-mono truncate">
                     {o.orderNumber || "—"}
-                  </td>
+                  </p>
+                </div>
+              </button>
 
-                  <td className="px-4 py-3.5 text-[var(--text-3)]">
-                    {o.carrier ? (
-                      carrier ? (
-                        <span className="flex items-center gap-2" title={carrier.name}>
-                          <Image
-                            src={`/carriers/${carrier.slug}.png`}
-                            alt={carrier.name}
-                            width={20}
-                            height={20}
-                            className="rounded shrink-0"
-                          />
-                          <span className="sr-only">{carrier.name}</span>
-                        </span>
-                      ) : (
-                        o.carrier
-                      )
-                    ) : (
-                      "—"
-                    )}
-                  </td>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button onClick={(e) => toggleStatusMenu(o.id, e)}>
+                  <StatusBadge status={o.status} />
+                </button>
 
-                  <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-4)]">
-                    {o.trackingNumber ? (
-                      carrier ? (
-                        <a
-                          href={carrier.trackingUrl(o.trackingNumber)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline hover:text-[var(--accent-300)]"
-                        >
-                          {o.trackingNumber}
-                        </a>
-                      ) : (
-                        o.trackingNumber
-                      )
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-
-                  <td className="px-4 py-3.5 text-right text-[var(--text-3)]">
-                    {o.items}
-                  </td>
-
-                  <td className="px-4 py-3.5 text-right font-semibold text-[var(--color-white)]">
-                    {fmt(o.amount)}
-                  </td>
-
-                  <td className="px-4 py-3.5 text-[var(--text-4)] text-xs">
-                    {fmtDate(o.paymentDate)}
-                  </td>
-
-                  {/* ───── DELAY ───── */}
-                  <td className={`px-4 py-3.5 font-semibold ${getDelayColor(delay)}`}>
-                    {delay}j
-                  </td>
-
-                  {/* ───── TECH ───── */}
-                  <td className="px-4 py-3.5 text-[var(--text-3)] text-xs">
-                    {o.tech || "—"}
-                  </td>
-
-                  {/* ───── NOTE ───── */}
-                  <td className="px-4 py-3.5 text-[var(--text-4)] text-xs max-w-[160px]">
-                    {o.note ? (
-                      <span title={o.note}>
-                        {o.note.length > 20
-                          ? o.note.slice(0, 20) + "..."
-                          : o.note}
-                      </span>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-
-                  {/* STATUS */}
-                  <td className="px-4 py-3.5 relative">
-                    <button onClick={(e) => toggleStatusMenu(o.id, e)}>
-                      <StatusBadge status={o.status} />
-                    </button>
-                  </td>
-
-                  {/* ───── RETOUR ───── */}
-                  <td className="px-4 py-3.5 text-[var(--text-3)]">
-                    {o.returnCarrier ? (
-                      returnCarrier ? (
-                        <span className="flex items-center gap-2" title={returnCarrier.name}>
-                          <Image
-                            src={`/carriers/${returnCarrier.slug}.png`}
-                            alt={returnCarrier.name}
-                            width={20}
-                            height={20}
-                            className="rounded shrink-0"
-                          />
-                          <span className="sr-only">{returnCarrier.name}</span>
-                        </span>
-                      ) : (
-                        o.returnCarrier
-                      )
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-
-                  <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-4)]">
-                    {o.returnTrackingNumber ? (
-                      returnCarrier ? (
-                        <a
-                          href={returnCarrier.trackingUrl(o.returnTrackingNumber)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline hover:text-[var(--accent-300)]"
-                        >
-                          {o.returnTrackingNumber}
-                        </a>
-                      ) : (
-                        o.returnTrackingNumber
-                      )
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-
-                  <td
-                    className={
-                      returnDelay === null
-                        ? "px-4 py-3.5 text-[var(--text-5)]"
-                        : `px-4 py-3.5 font-semibold ${getDelayColor(returnDelay)}`
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setActionsMenuId(actionsMenuId === o.id ? null : o.id)
                     }
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-5)] hover:text-[var(--color-white)] hover:bg-white/5 transition-colors"
                   >
-                    {returnDelay === null ? "—" : `${returnDelay}j`}
-                  </td>
+                    ⋯
+                  </button>
 
-                  {/* ACTIONS */}
-                  <td className="px-4 py-3.5 text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition">
-                      <ActionBtn title="Edit" onClick={() => onEdit(o)} />
-                      <ActionBtn title="Dup" onClick={() => onDuplicate(o)} />
-                      <ActionBtn
-                        title="Delete"
-                        onClick={() => onDelete(o)}
+                  {actionsMenuId === o.id && (
+                    <div
+                      ref={actionsMenuRef}
+                      className="absolute right-0 top-full mt-1 w-40 bg-[var(--dropdown-bg)] border border-white/10 rounded-xl z-20 py-1 shadow-xl shadow-black/40"
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          onEdit(o)
+                          setActionsMenuId(null)
+                        }}
+                      >
+                        ✏️ Modifier
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          onDuplicate(o)
+                          setActionsMenuId(null)
+                        }}
+                      >
+                        📋 Dupliquer
+                      </MenuItem>
+                      <MenuItem
                         danger
-                      />
+                        onClick={() => {
+                          onDelete(o)
+                          setActionsMenuId(null)
+                        }}
+                      >
+                        🗑️ Supprimer
+                      </MenuItem>
                     </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* STATS */}
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <Stat label="Montant" value={fmt(o.amount)} />
+              <Stat label="Articles" value={String(o.items)} />
+              <Stat label="Payé le" value={fmtDate(o.paymentDate)} />
+              <Stat label="Délai" value={`${delay}j`} className={getDelayColor(delay)} />
+              {accountCfg && (
+                <Pill>
+                  {accountCfg.emoji} {accountCfg.label}
+                </Pill>
+              )}
+              {deliveryCfg && (
+                <Pill>
+                  {deliveryCfg.emoji} {deliveryCfg.label}
+                </Pill>
+              )}
+            </div>
+
+            {/* TRANSPORTEUR / TECH */}
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[var(--text-3)]">
+              <CarrierTrack carrierRaw={o.carrier} tracking={o.trackingNumber} />
+              {o.tech && <span>🔧 {o.tech}</span>}
+            </div>
+
+            {/* RETOUR */}
+            {o.returnCarrier && (
+              <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+                <span className="text-[var(--text-5)] font-medium shrink-0">↩ Retour</span>
+                <CarrierTrack carrierRaw={o.returnCarrier} tracking={o.returnTrackingNumber ?? ""} />
+                <span
+                  className={
+                    returnDelay === null
+                      ? "text-[var(--text-5)]"
+                      : `font-semibold ${getDelayColor(returnDelay)}`
+                  }
+                >
+                  {returnDelay === null ? "—" : `${returnDelay}j de retour`}
+                </span>
+              </div>
+            )}
+
+            {/* NOTE */}
+            {o.note && (
+              <p
+                className="mt-3 text-xs text-[var(--text-4)] italic line-clamp-2"
+                title={o.note}
+              >
+                {o.note}
+              </p>
+            )}
+          </div>
+        )
+      })}
+
       {selectedShop && (
-  <ShopModal
-    slug={selectedShop}
-    onClose={() => setSelectedShop(null)}
-  />
-)}
+        <ShopModal slug={selectedShop} onClose={() => setSelectedShop(null)} />
+      )}
+
       {returnModalOrderId && (
         <ReturnModal
           onConfirm={(carrier, trackingNumber) =>
@@ -412,6 +343,7 @@ export function OrdersTable({
           onClose={() => setReturnModalOrderId(null)}
         />
       )}
+
       {statusMenu &&
         menuPos &&
         createPortal(
@@ -446,44 +378,94 @@ export function OrdersTable({
 
 /* ───────── small components ───────── */
 
-function Th({
-  children,
-  align = "left",
+function CarrierTrack({
+  carrierRaw,
+  tracking,
 }: {
-  children?: React.ReactNode
-  align?: "left" | "right"
+  carrierRaw: string
+  tracking: string
 }) {
+  if (!carrierRaw) return <span className="text-[var(--text-5)]">—</span>
+
+  const carrier = getCarrier(carrierRaw)
+
   return (
-    <th
-      className={`px-4 py-3 text-xs text-[var(--text-5)] uppercase ${
-        align === "right" ? "text-right" : "text-left"
-      }`}
-    >
-      {children}
-    </th>
+    <span className="inline-flex items-center gap-1.5">
+      {carrier && (
+        <Image
+          src={`/carriers/${carrier.slug}.png`}
+          alt={carrier.name}
+          width={16}
+          height={16}
+          className="rounded shrink-0"
+        />
+      )}
+      {tracking ? (
+        carrier ? (
+          <a
+            href={carrier.trackingUrl(tracking)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono hover:underline hover:text-[var(--accent-300)]"
+          >
+            {tracking}
+          </a>
+        ) : (
+          <span className="font-mono">{tracking}</span>
+        )
+      ) : (
+        <span>{carrier ? carrier.name : carrierRaw}</span>
+      )}
+    </span>
   )
 }
 
-function ActionBtn({
-  title,
+function Stat({
+  label,
+  value,
+  className = "",
+}: {
+  label: string
+  value: string
+  className?: string
+}) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-[10px] uppercase tracking-wide text-[var(--text-6)]">
+        {label}
+      </span>
+      <span className={`text-sm font-semibold text-[var(--color-white)] ${className}`}>
+        {value}
+      </span>
+    </div>
+  )
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 text-xs text-[var(--text-2)]">
+      {children}
+    </span>
+  )
+}
+
+function MenuItem({
+  children,
   onClick,
   danger,
 }: {
-  title: string
+  children: React.ReactNode
   onClick: () => void
   danger?: boolean
 }) {
   return (
     <button
-      title={title}
       onClick={onClick}
-      className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-        danger
-          ? "text-red-400 hover:bg-red-400/10"
-          : "text-[var(--text-5)] hover:text-[var(--color-white)] hover:bg-white/5"
+      className={`w-full text-left px-3 py-2 text-xs hover:bg-white/5 ${
+        danger ? "text-red-400" : "text-[var(--text-2)]"
       }`}
     >
-      ⋯
+      {children}
     </button>
   )
 }

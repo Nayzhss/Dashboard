@@ -7,6 +7,7 @@ import type {
   SortField,
   SortDir,
   OrderFormData,
+  OrderUpdateInput,
 } from "../components/orders/types"
 
 export function useOrders() {
@@ -147,7 +148,7 @@ export function useOrders() {
   const updateOrder = useCallback(
     async (
       id: string,
-      data: Partial<Order>
+      data: OrderUpdateInput
     ): Promise<void> => {
       const current = orders.find(
         (o) => o.id === id
@@ -155,6 +156,8 @@ export function useOrders() {
 
       const payload: Partial<Order> = {
         ...data,
+        accountType: data.accountType === "" ? undefined : data.accountType,
+        deliveryType: data.deliveryType === "" ? undefined : data.deliveryType,
       }
 
       // Gèle le délai quand la commande

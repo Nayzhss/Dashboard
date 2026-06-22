@@ -17,14 +17,20 @@ function StatCard({
   value,
   sub,
   accent,
+  delay = 0,
 }: {
   label: string
   value: string
   sub?: string
   accent?: string
+  delay?: number
 }) {
   return (
-    <div className="bg-[var(--surface)] border border-white/5 rounded-2xl p-5 flex flex-col gap-1 hover:border-white/10 transition-colors">
+    <div
+      className="animate-fade-up bg-[var(--surface)] border border-white/5 rounded-2xl p-5 flex flex-col gap-1 hover:border-white/10 hover:-translate-y-0.5 transition-all duration-300"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+
       <p className="text-xs font-medium text-[var(--text-4)] uppercase tracking-widest">
         {label}
       </p>
@@ -60,32 +66,37 @@ export function StatsBar({ stats, loading }: Props) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-      <StatCard label="Commandes" value={String(stats.total)} />
+      <StatCard label="Commandes" value={String(stats.total)} delay={0} />
       <StatCard
         label="Montant total"
         value={fmt(stats.totalAmount)}
         accent="text-[var(--accent-300)]"
+        delay={40}
       />
       <StatCard
         label="Bénéf du mois"
         value={fmt(stats.monthlyProfit)}
         accent={stats.monthlyProfit < 0 ? "text-red-400" : "text-emerald-300"}
+        delay={80}
       />
       <StatCard
         label="En attente"
         value={String(stats.pending)}
         accent="text-amber-300"
         sub={stats.total ? `${Math.round((stats.pending / stats.total) * 100)}%` : undefined}
+        delay={120}
       />
       <StatCard
         label="Remboursées"
         value={String(stats.refunded)}
         accent="text-emerald-300"
+        delay={160}
       />
       <StatCard
         label="Échecs"
         value={String(stats.failed)}
         accent={stats.failed > 0 ? "text-red-400" : "text-[var(--color-white)]"}
+        delay={200}
       />
     </div>
   )

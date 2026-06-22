@@ -6,6 +6,8 @@ import {
   EMPTY_FORM,
   DEFAULT_TECHS,
   RETURN_TECHS,
+  ACCOUNT_TYPE_CONFIG,
+  DELIVERY_TYPE_CONFIG,
 } from "./types"
 import type { Order, OrderFormData, Status } from "./types"
 import { ShopNameInput } from "../shops/ShopNameInput"
@@ -45,6 +47,9 @@ export function OrderModal({
 
         tech: order.tech ?? "",
         note: order.note ?? "",
+
+        accountType: order.accountType ?? "",
+        deliveryType: order.deliveryType ?? "",
 
         deliveredAt: order.deliveredAt?.slice(0, 10) ?? "",
       })
@@ -173,6 +178,42 @@ export function OrderModal({
               />
             </Field>
           </div>
+
+          <Field label="Compte">
+            <div className="flex gap-1.5">
+              {(Object.keys(ACCOUNT_TYPE_CONFIG) as Array<keyof typeof ACCOUNT_TYPE_CONFIG>).map(
+                (key) => (
+                  <PillOption
+                    key={key}
+                    active={form.accountType === key}
+                    onClick={() =>
+                      set("accountType", form.accountType === key ? "" : key)
+                    }
+                  >
+                    {ACCOUNT_TYPE_CONFIG[key].emoji} {ACCOUNT_TYPE_CONFIG[key].label}
+                  </PillOption>
+                )
+              )}
+            </div>
+          </Field>
+
+          <Field label="Livraison">
+            <div className="flex gap-1.5">
+              {(Object.keys(DELIVERY_TYPE_CONFIG) as Array<keyof typeof DELIVERY_TYPE_CONFIG>).map(
+                (key) => (
+                  <PillOption
+                    key={key}
+                    active={form.deliveryType === key}
+                    onClick={() =>
+                      set("deliveryType", form.deliveryType === key ? "" : key)
+                    }
+                  >
+                    {DELIVERY_TYPE_CONFIG[key].emoji} {DELIVERY_TYPE_CONFIG[key].label}
+                  </PillOption>
+                )
+              )}
+            </div>
+          </Field>
 
           <div className="grid grid-cols-3 gap-3">
             <Field label="Articles">
@@ -326,6 +367,30 @@ export function OrderModal({
         </div>
       </div>
     </div>
+  )
+}
+
+function PillOption({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium border whitespace-nowrap transition-colors ${
+        active
+          ? "bg-[var(--accent-500)]/15 border-[var(--accent-500)]/50 text-[var(--accent-300)]"
+          : "bg-[var(--input-bg)] border-white/5 text-[var(--text-3)] hover:border-white/15"
+      }`}
+    >
+      {children}
+    </button>
   )
 }
 

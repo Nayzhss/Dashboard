@@ -8,6 +8,7 @@ import { ShopModal } from "../components/shops/ShopModal"
 import { ShopSearch } from "../components/shops/ShopSearch"
 import { Header } from "../components/Header"
 import { Footer } from "../components/Footer"
+import { BackgroundOrbs } from "../components/BackgroundOrbs"
 
 const RANK_STYLES = [
   "border-[var(--accent-400)]/40 shadow-[0_0_24px_-8px_rgba(167,139,250,0.5)]",
@@ -31,11 +32,14 @@ export default function BoutiquesPage() {
   const top3 = sortedShops.slice(0, 3)
 
   return (
-    <main className="min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
+    <main className="relative overflow-hidden min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
+      <BackgroundOrbs />
+
+      <div className="relative z-10">
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="animate-fade-up mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Boutiques</h1>
             <p className="text-sm text-[var(--text-4)] mt-1">
@@ -64,7 +68,8 @@ export default function BoutiquesPage() {
                   <div
                     key={shop.slug}
                     onClick={() => setSelectedShop(shop.slug)}
-                    className={`relative bg-[var(--surface)] border rounded-2xl p-5 cursor-pointer transition-colors hover:border-[var(--accent-400)]/50 ${RANK_STYLES[i]}`}
+                    style={{ animationDelay: `${i * 80}ms` }}
+                    className={`animate-fade-up group relative bg-[var(--surface)] border rounded-2xl p-5 cursor-pointer transition-all duration-300 hover:border-[var(--accent-400)]/50 hover:-translate-y-1 ${RANK_STYLES[i]}`}
                   >
                     <span className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-500)]/15 text-[var(--accent-300)] text-xs font-semibold flex items-center justify-center">
                       {i + 1}
@@ -75,7 +80,7 @@ export default function BoutiquesPage() {
                       alt={shop.name}
                       width={48}
                       height={48}
-                      className="rounded-xl mb-4"
+                      className="rounded-xl mb-4 transition-transform duration-300 group-hover:scale-110"
                     />
 
                     <h2 className="font-semibold leading-tight">{shop.name}</h2>
@@ -98,11 +103,12 @@ export default function BoutiquesPage() {
               </p>
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sortedShops.map((shop) => (
+                {sortedShops.map((shop, i) => (
                   <div
                     key={shop.slug}
                     onClick={() => setSelectedShop(shop.slug)}
-                    className="bg-[var(--surface)] border border-white/5 rounded-2xl p-5 cursor-pointer transition-colors hover:border-white/15"
+                    style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}
+                    className="animate-fade-up bg-[var(--surface)] border border-white/5 rounded-2xl p-5 cursor-pointer transition-all duration-300 hover:border-white/15 hover:-translate-y-0.5"
                   >
                     <div className="flex items-center gap-3">
                       <Image
@@ -139,6 +145,7 @@ export default function BoutiquesPage() {
       </div>
 
       <Footer />
+      </div>
 
       {selectedShop && (
         <ShopModal slug={selectedShop} onClose={() => setSelectedShop(null)} />

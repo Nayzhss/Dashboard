@@ -1,15 +1,21 @@
 import { Header } from "../components/Header"
 import { Footer } from "../components/Footer"
+import { BackgroundOrbs } from "../components/BackgroundOrbs"
 
 function Section({
   title,
   children,
+  delay = 0,
 }: {
   title: string
   children: React.ReactNode
+  delay?: number
 }) {
   return (
-    <section className="bg-[var(--surface)] border border-white/5 rounded-2xl p-6">
+    <section
+      style={{ animationDelay: `${delay}ms` }}
+      className="animate-fade-up bg-[var(--surface)] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
+    >
       <h2 className="font-semibold text-[var(--color-white)] mb-3">{title}</h2>
       <div className="space-y-2.5 text-sm text-[var(--text-2)] leading-relaxed">
         {children}
@@ -20,11 +26,14 @@ function Section({
 
 export default function AidePage() {
   return (
-    <main className="min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
+    <main className="relative overflow-hidden min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
+      <BackgroundOrbs />
+
+      <div className="relative z-10">
       <Header />
 
       <div className="max-w-3xl mx-auto px-6 py-10">
-        <div className="mb-8">
+        <div className="animate-fade-up mb-8">
           <h1 className="text-2xl font-semibold tracking-tight">Aide</h1>
           <p className="text-sm text-[var(--text-4)] mt-1">
             Comment fonctionne le dashboard, en détail.
@@ -32,7 +41,7 @@ export default function AidePage() {
         </div>
 
         <div className="space-y-5">
-          <Section title="📦 Suivi automatique des livraisons">
+          <Section title="📦 Suivi automatique des livraisons" delay={0}>
             <p>
               Quand une commande a un transporteur reconnu (DHL, UPS, Chronopost,
               Colissimo, GLS, DPD, Mondial Relay, Relais Colis, Bpost, Amazon,
@@ -54,7 +63,7 @@ export default function AidePage() {
             </p>
           </Section>
 
-          <Section title="⏱ Délai">
+          <Section title="⏱ Délai" delay={60}>
             <p>La colonne « Délai » se calcule différemment selon où en est la commande :</p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Tant que rien n'est figé : nombre de jours depuis la date de paiement, mis à jour en continu.</li>
@@ -71,7 +80,7 @@ export default function AidePage() {
             </ul>
           </Section>
 
-          <Section title="↩️ Commande en retour">
+          <Section title="↩️ Commande en retour" delay={120}>
             <p>
               Passer le statut d'une commande sur <strong>« Retour »</strong>{" "}
               ouvre une popup qui demande le transporteur du retour et son
@@ -88,7 +97,7 @@ export default function AidePage() {
             </p>
           </Section>
 
-          <Section title="🏬 Page Boutiques">
+          <Section title="🏬 Page Boutiques" delay={180}>
             <p>
               Liste toutes les boutiques connues, avec leurs méthodes, taux de
               réussite et un score de <strong>rentabilité</strong> calculé comme
@@ -107,7 +116,7 @@ export default function AidePage() {
             </p>
           </Section>
 
-          <Section title="🚚 Transporteur dans le formulaire de commande">
+          <Section title="🚚 Transporteur dans le formulaire de commande" delay={240}>
             <p>
               Le champ « Transporteur » propose une auto-complétion avec
               l'icône du transporteur. Une fois enregistré, le numéro de suivi
@@ -116,14 +125,14 @@ export default function AidePage() {
             </p>
           </Section>
 
-          <Section title="🎨 Thème">
+          <Section title="🎨 Thème" delay={300}>
             <p>
               Le bouton soleil/lune dans le header bascule entre thème sombre et
               clair. Le choix est mémorisé sur cet appareil.
             </p>
           </Section>
 
-          <Section title="🔐 Connexion">
+          <Section title="🔐 Connexion" delay={360}>
             <p>
               Connexion possible avec l'email ou le nom d'utilisateur choisi à
               l'inscription, dans le même champ — pas besoin de préciser lequel.
@@ -135,6 +144,7 @@ export default function AidePage() {
       </div>
 
       <Footer />
+      </div>
     </main>
   )
 }

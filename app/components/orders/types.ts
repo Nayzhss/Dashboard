@@ -9,6 +9,9 @@ export type Status =
 
 export type ReturnStatus = "waiting" | "scanned" | "returned"
 
+export type AccountType = "fresh" | "old"
+export type DeliveryType = "domicile" | "relais"
+
 export type SortField = "paymentDate" | "amount" | "shop"
 export type SortDir = "asc" | "desc"
 
@@ -27,6 +30,9 @@ export interface Order {
   tech?: string
   note?: string
 
+  accountType?: AccountType
+  deliveryType?: DeliveryType
+
   // délai figé quand commande remboursée ou fail
   frozenDelay?: number
 
@@ -37,6 +43,13 @@ export interface Order {
   returnShippedAt?: string
   // délai retour figé quand commande remboursée ou fail
   returnFrozenDelay?: number
+}
+
+// Données mutables d'une commande, où accountType/deliveryType peuvent
+// valoir "" (depuis le formulaire) en plus de leur valeur réelle ou undefined
+export type OrderUpdateInput = Partial<Omit<Order, "accountType" | "deliveryType">> & {
+  accountType?: AccountType | ""
+  deliveryType?: DeliveryType | ""
 }
 
 export interface OrderFormData {
@@ -52,6 +65,9 @@ export interface OrderFormData {
 
   tech: string
   note: string
+
+  accountType: AccountType | ""
+  deliveryType: DeliveryType | ""
 
   deliveredAt: string
 }
@@ -150,6 +166,16 @@ export const RETURN_TECHS = [
   "FTID",
 ] as const
 
+export const ACCOUNT_TYPE_CONFIG: Record<AccountType, { label: string; emoji: string }> = {
+  fresh: { label: "Fresh", emoji: "✨" },
+  old: { label: "Old", emoji: "📦" },
+}
+
+export const DELIVERY_TYPE_CONFIG: Record<DeliveryType, { label: string; emoji: string }> = {
+  domicile: { label: "Domicile", emoji: "🏠" },
+  relais: { label: "Point relais", emoji: "🏪" },
+}
+
 export const EMPTY_FORM: OrderFormData = {
   shopSlug: "",
   orderNumber: "",
@@ -163,6 +189,9 @@ export const EMPTY_FORM: OrderFormData = {
 
   tech: "",
   note: "",
+
+  accountType: "",
+  deliveryType: "",
 
   deliveredAt: "",
 }

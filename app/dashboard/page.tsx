@@ -11,6 +11,7 @@ import { DeleteConfirm } from "@/app/components/orders/DeleteConfirm"
 import { ToastContainer } from "@/app/components/orders/Toast"
 import { Header } from "@/app/components/Header"
 import { Footer } from "@/app/components/Footer"
+import { BackgroundOrbs } from "@/app/components/BackgroundOrbs"
 import type { Order, OrderFormData, Status } from "@/app/components/orders/types"
 
 type ModalState =
@@ -121,13 +122,16 @@ export default function DashboardPage() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <main className="min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
+    <main className="relative overflow-hidden min-h-screen bg-[var(--bg)] text-[var(--color-white)]">
+      <BackgroundOrbs />
+
+      <div className="relative z-10">
       <Header />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Page title */}
-        <div className="mb-8 flex items-end justify-between">
+        <div className="animate-fade-up mb-8 flex items-end justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-[var(--color-white)] tracking-tight">
               Dashboard
@@ -171,6 +175,7 @@ export default function DashboardPage() {
       </div>
 
       <Footer />
+      </div>
 
       {/* Modals */}
       {modal.type === "create" && (
