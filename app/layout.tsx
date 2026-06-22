@@ -13,8 +13,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OPENRF Community",
+  metadataBase: new URL("https://dashboardrefund.vercel.app"),
+  title: {
+    default: "OPENRF Community",
+    template: "%s · OPENRF Community",
+  },
   description: "Dashboard pour les frérots, régalez-vous.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "OPENRF Community",
+    description: "Dashboard pour les frérots, régalez-vous.",
+    siteName: "OPENRF Community",
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OPENRF Community",
+    description: "Dashboard pour les frérots, régalez-vous.",
+  },
 };
 
 export default function RootLayout({

@@ -165,12 +165,14 @@ export default function DashboardPage() {
         {/* Table */}
         <OrdersTable
           orders={filteredOrders}
+          totalCount={orders.length}
           loading={loading}
           onEdit={(order) => setModal({ type: "edit", order })}
           onDelete={(order) => setModal({ type: "delete", order })}
           onDuplicate={handleDuplicate}
           onStatusChange={handleStatusChange}
           onMarkReturn={handleMarkReturn}
+          onNew={() => setModal({ type: "create" })}
         />
       </div>
 

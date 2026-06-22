@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
+import { getShopScore, SHOP_CATEGORY_CONFIG } from "../../data/shops"
 import type { Shop } from "../../data/shops"
+
+function fmtScore(score: number) {
+  return score > 0 ? `${Math.round(score)} €/j` : "—"
+}
 
 interface Props {
   shops: Shop[]
@@ -88,12 +93,20 @@ export function ShopSearch({ shops, onSelect }: Props) {
               <Image
                 src={`/logo/${shop.slug}.png`}
                 alt={shop.name}
-                width={28}
-                height={28}
+                width={32}
+                height={32}
                 className="rounded-md shrink-0"
               />
-              <span className="text-sm text-[var(--color-white)] truncate">
-                {highlight(shop.name, query)}
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm text-[var(--color-white)] truncate">
+                  {highlight(shop.name, query)}
+                </span>
+                <span className="block text-[10px] text-[var(--text-4)] truncate">
+                  {SHOP_CATEGORY_CONFIG[shop.category].emoji} {SHOP_CATEGORY_CONFIG[shop.category].label}
+                </span>
+              </span>
+              <span className="text-xs font-semibold text-[var(--accent-300)] shrink-0">
+                {fmtScore(getShopScore(shop))}
               </span>
             </button>
           ))}

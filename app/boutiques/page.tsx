@@ -85,11 +85,35 @@ export default function BoutiquesPage() {
         )}
 
         {loading ? (
-          <p className="text-sm text-[var(--text-4)]">Chargement…</p>
+          <>
+            <div className="grid sm:grid-cols-3 gap-4 mb-12">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[172px] bg-[var(--surface)] border border-white/5 rounded-2xl animate-pulse"
+                />
+              ))}
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[140px] bg-[var(--surface)] border border-white/5 rounded-2xl animate-pulse"
+                />
+              ))}
+            </div>
+          </>
         ) : shops.length === 0 ? (
-          <p className="text-sm text-[var(--text-4)]">Aucune boutique pour l'instant.</p>
+          <EmptyState emoji="🏬" message="Aucune boutique pour l'instant." />
         ) : sortedShops.length === 0 ? (
-          <p className="text-sm text-[var(--text-4)]">Aucune boutique dans cette catégorie.</p>
+          <EmptyState emoji="🔍" message="Aucune boutique dans cette catégorie.">
+            <button
+              onClick={() => setCategory("all")}
+              className="mt-4 px-4 py-2 rounded-xl bg-[var(--accent-600)] hover:bg-[var(--accent-500)] text-sm font-medium text-[#fff] transition-colors"
+            >
+              Voir toutes les boutiques
+            </button>
+          </EmptyState>
         ) : (
           <>
             {/* TOP 3 RENTABILITÉ */}
@@ -196,6 +220,24 @@ export default function BoutiquesPage() {
         <ShopModal slug={selectedShop} onClose={() => setSelectedShop(null)} />
       )}
     </main>
+  )
+}
+
+function EmptyState({
+  emoji,
+  message,
+  children,
+}: {
+  emoji: string
+  message: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-center">
+      <div className="text-4xl mb-3 opacity-80">{emoji}</div>
+      <p className="text-[var(--text-4)] font-medium">{message}</p>
+      {children}
+    </div>
   )
 }
 

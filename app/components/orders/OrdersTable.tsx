@@ -14,12 +14,14 @@ import { ReturnModal } from "./ReturnModal"
 
 interface Props {
   orders: Order[]
+  totalCount: number
   loading: boolean
   onEdit: (order: Order) => void
   onDelete: (order: Order) => void
   onDuplicate: (order: Order) => void
   onStatusChange: (id: string, status: Status) => Promise<void>
   onMarkReturn: (id: string, carrier: string, trackingNumber: string) => Promise<void>
+  onNew: () => void
 }
 
 /* ───────── utils ───────── */
@@ -101,12 +103,14 @@ function getDelayColor(days: number) {
 
 export function OrdersTable({
   orders,
+  totalCount,
   loading,
   onEdit,
   onDelete,
   onDuplicate,
   onStatusChange,
   onMarkReturn,
+  onNew,
 }: Props) {
   const { getShop } = useShops()
   const [statusMenu, setStatusMenu] = useState<string | null>(null)
@@ -114,6 +118,7 @@ export function OrdersTable({
   const [selectedShop, setSelectedShop] = useState<string | null>(null)
   const [returnModalOrderId, setReturnModalOrderId] = useState<string | null>(null)
   const [actionsMenuId, setActionsMenuId] = useState<string | null>(null)
+  const [flashId, setFlashId] = useState<string | null>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const actionsMenuRef = useRef<HTMLDivElement>(null)
@@ -143,6 +148,11 @@ export function OrdersTable({
       window.removeEventListener("resize", close)
     }
   }, [statusMenu])
+
+  function flash(id: string) {
+    setFlashId(id)
+    setTimeout(() => setFlashId((current) => (current === id ? null : current)), 1200)
+  }
 
   function toggleStatusMenu(orderId: string, e: React.MouseEvent<HTMLButtonElement>) {
     setActionsMenuId(null)
@@ -180,11 +190,22 @@ export function OrdersTable({
   /* ───────── empty ───────── */
 
   if (orders.length === 0) {
+    const isFiltered = totalCount > 0
+
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="text-4xl mb-3 opacity-80">{isFiltered ? "🔍" : "📦"}</div>
         <p className="text-[var(--text-4)] font-medium">
-          Aucune commande trouvée
+          {isFiltered ? "Aucune commande ne correspond à ces filtres" : "Aucune commande pour l'instant"}
         </p>
+        {!isFiltered && (
+          <button
+            onClick={onNew}
+            className="mt-4 px-4 py-2 rounded-xl bg-[var(--accent-600)] hover:bg-[var(--accent-500)] text-sm font-medium text-[#fff] transition-colors"
+          >
+            + Créer ta première commande
+          </button>
+        )}
       </div>
     )
   }
@@ -208,7 +229,9 @@ export function OrdersTable({
         return (
           <div
             key={o.id}
-            className="animate-fade-up bg-[var(--surface)] border border-white/5 rounded-2xl p-4 sm:p-5 hover:border-white/10 transition-colors"
+            className={`animate-fade-up bg-[var(--surface)] border border-white/5 rounded-2xl p-4 sm:p-5 hover:border-white/10 transition-colors ${
+              flashId === o.id ? "animate-flash" : ""
+            }`}
             style={{ animationDelay: `${Math.min(idx * 40, 320)}ms` }}
           >
             {/* HEADER */}
@@ -350,9 +373,10 @@ export function OrdersTable({
 
       {returnModalOrderId && (
         <ReturnModal
-          onConfirm={(carrier, trackingNumber) =>
-            onMarkReturn(returnModalOrderId, carrier, trackingNumber)
-          }
+          onConfirm={async (carrier, trackingNumber) => {
+            await onMarkReturn(returnModalOrderId, carrier, trackingNumber)
+            flash(returnModalOrderId)
+          }}
           onClose={() => setReturnModalOrderId(null)}
         />
       )}
@@ -369,13 +393,15 @@ export function OrdersTable({
               <button
                 key={s}
                 onClick={async () => {
+                  const id = statusMenu
                   if (s === "Retour") {
-                    setReturnModalOrderId(statusMenu)
+                    setReturnModalOrderId(id)
                     setStatusMenu(null)
                     return
                   }
-                  await onStatusChange(statusMenu, s)
+                  await onStatusChange(id, s)
                   setStatusMenu(null)
+                  flash(id)
                 }}
                 className="w-full text-left px-3 py-2 text-xs hover:bg-white/5"
               >
