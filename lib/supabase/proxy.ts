@@ -5,6 +5,7 @@ const PUBLIC_PAGES = ["/login", "/signup"]
 const PUBLIC_API_PATHS = [
   "/api/auth/check-username",
   "/api/auth/resolve-username",
+  "/api/backup",
 ]
 
 export async function updateSession(request: NextRequest) {
