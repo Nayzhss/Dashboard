@@ -8,7 +8,7 @@ export const CARRIERS: Carrier[] = [
   {
     slug: "dhl",
     name: "DHL",
-    trackingUrl: (t) => `https://www.dhl.com/fr-fr/home/tracking.html?tracking-id=${encodeURIComponent(t)}`,
+    trackingUrl: (t) => `https://www.dhl.com/fr-fr/home/tracking.html?tracking-id=${encodeURIComponent(t)}&submit=1`,
   },
   {
     slug: "ups",
@@ -18,7 +18,7 @@ export const CARRIERS: Carrier[] = [
   {
     slug: "chronopost",
     name: "Chronopost",
-    trackingUrl: (t) => `https://www.chronopost.fr/tracking-no-cms/suivi-colis?listeNumerosLT=${encodeURIComponent(t)}`,
+    trackingUrl: (t) => `https://www.chronopost.fr/tracking-no-cms/suivi-page?listeNumerosLT=${encodeURIComponent(t)}`,
   },
   {
     slug: "colissimo",
@@ -31,9 +31,11 @@ export const CARRIERS: Carrier[] = [
     trackingUrl: (t) => `https://gls-group.com/FR/fr/suivi-colis?match=${encodeURIComponent(t)}`,
   },
   {
+    // DPD's tracking form is a POST with a CSRF token, no GET deep-link
+    // exists — this just opens the search page, number must be pasted in.
     slug: "dpd",
     name: "DPD",
-    trackingUrl: (t) => `https://trace.dpd.fr/fr/trace/${encodeURIComponent(t)}`,
+    trackingUrl: () => `https://trace.dpd.fr/fr/trace`,
   },
   {
     slug: "mondial-relay",
@@ -41,9 +43,11 @@ export const CARRIERS: Carrier[] = [
     trackingUrl: (t) => `https://www.mondialrelay.fr/suivi-de-colis/?numeroExpedition=${encodeURIComponent(t)}`,
   },
   {
+    // Same as DPD: Relais Colis' tracking form is a POST with a CSRF
+    // token, no GET deep-link exists.
     slug: "relais-colis",
     name: "Relais Colis",
-    trackingUrl: (t) => `https://www.relaiscolis.com/suivi-de-colis/?numColis=${encodeURIComponent(t)}`,
+    trackingUrl: () => `https://www.relaiscolis.com/suivi-de-colis/`,
   },
   {
     slug: "bpost",
