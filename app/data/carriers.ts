@@ -75,7 +75,7 @@ export const CARRIERS: Carrier[] = [
     slug: "fedex",
     name: "FedEx",
     trackingUrl: (t) => `https://www.fedex.com/fedextrack/?trknbr=${encodeURIComponent(t)}`,
-    track17Code: 100854,
+    track17Code: 100003,
   },
 ]
 
