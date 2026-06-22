@@ -6,6 +6,7 @@ import Image from "next/image"
 import { StatusBadge } from "./StatusBadge"
 import { STATUS_LIST } from "./types"
 import { useShops } from "../../hooks/useShops"
+import { getCarrier } from "../../data/carriers"
 import type { Order, Status } from "./types"
 import { ShopModal } from "../shops/ShopModal"
 
@@ -177,6 +178,7 @@ export function OrdersTable({
           <tbody className="bg-[var(--table-bg)]">
             {orders.map((o, idx) => {
               const shop = getShop(o.shopSlug.toLowerCase())
+              const carrier = getCarrier(o.carrier)
               const delay = getDelay(o.paymentDate, o.status, o.frozenDelay)
 
               return (
@@ -208,11 +210,43 @@ export function OrdersTable({
                   </td>
 
                   <td className="px-4 py-3.5 text-[var(--text-3)]">
-                    {o.carrier || "—"}
+                    {o.carrier ? (
+                      carrier ? (
+                        <span className="flex items-center gap-2" title={carrier.name}>
+                          <Image
+                            src={`/carriers/${carrier.slug}.png`}
+                            alt={carrier.name}
+                            width={20}
+                            height={20}
+                            className="rounded shrink-0"
+                          />
+                          <span className="sr-only">{carrier.name}</span>
+                        </span>
+                      ) : (
+                        o.carrier
+                      )
+                    ) : (
+                      "—"
+                    )}
                   </td>
 
                   <td className="px-4 py-3.5 font-mono text-xs text-[var(--text-4)]">
-                    {o.trackingNumber || "—"}
+                    {o.trackingNumber ? (
+                      carrier ? (
+                        <a
+                          href={carrier.trackingUrl(o.trackingNumber)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline hover:text-[var(--accent-300)]"
+                        >
+                          {o.trackingNumber}
+                        </a>
+                      ) : (
+                        o.trackingNumber
+                      )
+                    ) : (
+                      "—"
+                    )}
                   </td>
 
                   <td className="px-4 py-3.5 text-right text-[var(--text-3)]">

@@ -9,6 +9,7 @@ import {
 } from "./types"
 import type { Order, OrderFormData, Status } from "./types"
 import { ShopNameInput } from "../shops/ShopNameInput"
+import { CarrierInput } from "./CarrierInput"
 
 interface Props {
   mode: "create" | "edit"
@@ -147,15 +148,9 @@ export function OrderModal({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Transporteur">
-              <input
-                type="text"
+              <CarrierInput
                 value={form.carrier}
-                onChange={(e) =>
-                  set(
-                    "carrier",
-                    e.target.value
-                  )
-                }
+                onChange={(value) => set("carrier", value)}
                 placeholder="DHL, Colissimo…"
                 className={inputCls}
               />
