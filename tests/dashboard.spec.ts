@@ -16,14 +16,21 @@ async function login(page: Page) {
   await page.waitForURL("/")
 }
 
-test("shops page loads with the Top 3 section after login", async ({ page }) => {
+test("home page loads after login", async ({ page }) => {
   await login(page)
+  await expect(page.getByRole("heading", { name: "OPENRF Community" })).toBeVisible()
+})
+
+test("shops page loads with the Top 3 section", async ({ page }) => {
+  await login(page)
+  await page.locator("nav").getByRole("link", { name: "Boutiques" }).click()
+  await page.waitForURL("/boutiques")
   await expect(page.getByText("Top 3 rentabilité")).toBeVisible()
 })
 
 test("dashboard loads with stats and the new order button", async ({ page }) => {
   await login(page)
-  await page.getByRole("link", { name: "Dashboard" }).click()
+  await page.locator("nav").getByRole("link", { name: "Dashboard" }).click()
   await page.waitForURL("/dashboard")
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible()
   await expect(

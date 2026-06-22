@@ -5,8 +5,10 @@ import { LogoutButton } from "./LogoutButton"
 import { ThemeToggle } from "./ThemeToggle"
 
 const NAV_LINKS = [
-  { href: "/", label: "Boutiques" },
+  { href: "/", label: "Accueil" },
+  { href: "/boutiques", label: "Boutiques" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/aide", label: "Aide" },
 ]
 
 export function Header() {
@@ -15,7 +17,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/5 bg-[var(--bg)]/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2.5 shrink-0">
+        <a href="/" className="flex items-center gap-2.5 shrink-0">
           <img
             src="/favicon.ico"
             alt=""
@@ -24,7 +26,7 @@ export function Header() {
           <span className="font-semibold text-sm text-[var(--color-white)] hidden sm:inline">
             OPENRF Community
           </span>
-        </div>
+        </a>
 
         <nav className="header-nav flex items-center gap-1 overflow-x-auto">
           {NAV_LINKS.map((link) => {
