@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { slugify } from "../../lib/slugify"
 import type { Shop } from "../data/shops"
 
 export function useShops() {
@@ -17,7 +18,8 @@ export function useShops() {
     refresh().finally(() => setLoading(false))
   }, [refresh])
 
-  function getShop(slug: string) {
+  function getShop(input: string) {
+    const slug = slugify(input)
     return shops.find((s) => s.slug === slug)
   }
 

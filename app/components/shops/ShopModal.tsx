@@ -27,7 +27,7 @@ function emptyForm(shop: Shop) {
 
 export function ShopModal({ slug, onClose }: Props) {
   const { getShop, loading, refresh } = useShops()
-  const shop = getShop(slug.toLowerCase())
+  const shop = getShop(slug)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState(() => (shop ? emptyForm(shop) : null))

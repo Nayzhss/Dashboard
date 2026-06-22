@@ -213,7 +213,7 @@ export function OrdersTable({
 
           <tbody className="bg-[var(--table-bg)]">
             {orders.map((o, idx) => {
-              const shop = getShop(o.shopSlug.toLowerCase())
+              const shop = getShop(o.shopSlug)
               const carrier = getCarrier(o.carrier)
               const delay = getDelay(o.paymentDate, o.status, o.frozenDelay, o.deliveredAt)
               const returnCarrier = o.returnCarrier ? getCarrier(o.returnCarrier) : undefined
@@ -228,7 +228,7 @@ export function OrdersTable({
                 >
                   <td
   className="px-4 py-3.5 font-medium text-[var(--color-white)] flex items-center gap-2 cursor-pointer"
-  onClick={() => setSelectedShop(o.shopSlug.toLowerCase())}
+  onClick={() => setSelectedShop(o.shopSlug)}
 >
   <Image
     src={`/logo/${o.shopSlug.toLowerCase()}.png`}
