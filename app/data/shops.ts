@@ -84,12 +84,22 @@ export interface Shop {
 }
 
 /**
- * Rentabilité = montant max / délai, en prenant la meilleure méthode de la boutique.
+ * Rentabilité = (montant max × fiabilité) / délai, en prenant la meilleure
+ * méthode de la boutique.
+ *
+ * La fiabilité est un taux de réussite lissé (vouches+1)/(vouches+fails+2) :
+ * une méthode avec 1 vouch et 0 fail ne doit pas écraser une méthode avec
+ * 50 vouches et 2 fails juste parce qu'elle n'a pas encore eu d'échec — le
+ * lissage tire les petits échantillons vers 50% tant qu'ils ne sont pas
+ * prouvés, ce qui reflète mieux le risque réel à retaper la boutique.
  */
 export function getShopScore(shop: Shop) {
   const ratios = shop.methods
     .filter((m) => m.avgDelay !== null && m.avgDelay > 0)
-    .map((m) => m.maxAmount / (m.avgDelay as number))
+    .map((m) => {
+      const reliability = (m.vouches + 1) / (m.vouches + m.fails + 2)
+      return (m.maxAmount * reliability) / (m.avgDelay as number)
+    })
 
   return ratios.length ? Math.max(...ratios) : 0
 }

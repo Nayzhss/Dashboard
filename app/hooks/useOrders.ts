@@ -175,29 +175,15 @@ export function useOrders() {
         payload.frozenDelay =
           getDelay(current)
 
+        payload.refundedAt = new Date().toISOString()
+
         if (current.returnShippedAt) {
           payload.returnFrozenDelay =
             getReturnDelay(current)
         }
       }
 
-      const res = await fetch("/api/orders", {
-        method: "PUT",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          id,
-          ...payload,
-        }),
-      })
-
-      if (!res.ok)
-        throw new Error(
-          "Erreur modification"
-        )
-
+      // optimiste : on applique tout de suite, on revient en arrière si la requête échoue
       setOrders((prev) =>
         prev.map((o) =>
           o.id === id
@@ -208,6 +194,32 @@ export function useOrders() {
             : o
         )
       )
+
+      try {
+        const res = await fetch("/api/orders", {
+          method: "PUT",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            id,
+            ...payload,
+          }),
+        })
+
+        if (!res.ok)
+          throw new Error(
+            "Erreur modification"
+          )
+      } catch (err) {
+        if (current) {
+          setOrders((prev) =>
+            prev.map((o) => (o.id === id ? current : o))
+          )
+        }
+        throw err
+      }
     },
     [orders]
   )
@@ -427,8 +439,12 @@ export function useOrders() {
       )
     }
 
+    // "Bénéf du mois" se base sur la date du remboursement/fail (refundedAt),
+    // pas sur la date de paiement : un achat de mai peut très bien être
+    // remboursé en juin, et c'est ce mois-ci que le profit est réellement réalisé.
     const monthlyProfit = orders.reduce((s, o) => {
-      if (!isThisMonth(o.paymentDate)) return s
+      const refDate = o.refundedAt || o.paymentDate
+      if (!isThisMonth(refDate)) return s
       if (o.status === "Remboursée") return s + Number(o.amount)
       if (o.status === "Fail") return s - Number(o.amount)
       return s
@@ -454,10 +470,31 @@ export function useOrders() {
           o.status === "Fail"
       ).length
 
+    // tendance des 6 derniers mois (mois courant inclus), même logique que
+    // monthlyProfit mais glissée mois par mois — sert au sparkline des stats
+    const monthlyTrend: number[] = []
+    for (let i = 5; i >= 0; i--) {
+      const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const profit = orders.reduce((s, o) => {
+        const refDate = o.refundedAt || o.paymentDate
+        if (!refDate) return s
+        const d = new Date(refDate)
+        const sameMonth =
+          d.getFullYear() === targetDate.getFullYear() &&
+          d.getMonth() === targetDate.getMonth()
+        if (!sameMonth) return s
+        if (o.status === "Remboursée") return s + Number(o.amount)
+        if (o.status === "Fail") return s - Number(o.amount)
+        return s
+      }, 0)
+      monthlyTrend.push(profit)
+    }
+
     return {
       total,
       totalAmount,
       monthlyProfit,
+      monthlyTrend,
       pending,
       refunded,
       failed,

@@ -23,9 +23,9 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true))
-    const t = setTimeout(() => setVisible(false), 3000)
+    const t = setTimeout(() => setVisible(false), Math.max(0, toast.duration - 400))
     return () => clearTimeout(t)
-  }, [])
+  }, [toast.duration])
 
   const colors = {
     success: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
@@ -59,6 +59,17 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
     >
       {icons[toast.type]}
       <span>{toast.message}</span>
+      {toast.action && (
+        <button
+          onClick={() => {
+            toast.action!.onClick()
+            onRemove(toast.id)
+          }}
+          className="font-semibold underline hover:opacity-80 transition-opacity"
+        >
+          {toast.action.label}
+        </button>
+      )}
       <button
         onClick={() => onRemove(toast.id)}
         className="ml-2 opacity-50 hover:opacity-100 transition-opacity"

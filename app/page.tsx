@@ -3,6 +3,7 @@
 import { Header } from "./components/Header"
 import { Footer } from "./components/Footer"
 import { BackgroundOrbs } from "./components/BackgroundOrbs"
+import { ShopLogoMarquee } from "./components/ShopLogoMarquee"
 
 const LINKS = [
   {
@@ -106,6 +107,10 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="relative z-10 pb-12">
+        <ShopLogoMarquee />
       </div>
 
       <Footer />

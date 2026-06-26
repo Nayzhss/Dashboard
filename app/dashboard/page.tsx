@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useOrders } from "@/app/hooks/useOrders"
 import { useToast } from "@/app/hooks/useToast"
 import { StatsBar } from "@/app/components/orders/StatsBar"
 import { Toolbar } from "@/app/components/orders/Toolbar"
 import { OrdersTable } from "@/app/components/orders/OrdersTable"
 import { OrderModal } from "@/app/components/orders/OrderModal"
-import { DeleteConfirm } from "@/app/components/orders/DeleteConfirm"
 import { ToastContainer } from "@/app/components/orders/Toast"
 import { Header } from "@/app/components/Header"
 import { Footer } from "@/app/components/Footer"
@@ -18,7 +17,6 @@ type ModalState =
   | { type: "none" }
   | { type: "create" }
   | { type: "edit"; order: Order }
-  | { type: "delete"; order: Order }
 
 export default function DashboardPage() {
   const {
@@ -41,6 +39,8 @@ export default function DashboardPage() {
 
   const { toasts, addToast, removeToast } = useToast()
   const [modal, setModal] = useState<ModalState>({ type: "none" })
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set())
+  const deleteTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
 
@@ -65,16 +65,41 @@ export default function DashboardPage() {
     }
   }
 
-  async function handleDelete() {
-    if (modal.type !== "delete") return
-    try {
-      await deleteOrder(modal.order.id)
-      addToast("Commande supprimée", "success")
-      setModal({ type: "none" })
-    } catch {
-      addToast("Erreur lors de la suppression", "error")
-      throw new Error()
-    }
+  function handleDeleteClick(order: Order) {
+    setPendingDeleteIds((prev) => new Set(prev).add(order.id))
+
+    const timer = setTimeout(async () => {
+      deleteTimers.current.delete(order.id)
+      try {
+        await deleteOrder(order.id)
+      } catch {
+        addToast("Erreur lors de la suppression", "error")
+      } finally {
+        setPendingDeleteIds((prev) => {
+          const next = new Set(prev)
+          next.delete(order.id)
+          return next
+        })
+      }
+    }, 5000)
+
+    deleteTimers.current.set(order.id, timer)
+
+    addToast(`"${order.shopSlug}" supprimée`, "success", {
+      duration: 5000,
+      action: {
+        label: "Annuler",
+        onClick: () => {
+          clearTimeout(deleteTimers.current.get(order.id))
+          deleteTimers.current.delete(order.id)
+          setPendingDeleteIds((prev) => {
+            const next = new Set(prev)
+            next.delete(order.id)
+            return next
+          })
+        },
+      },
+    })
   }
 
   async function handleDuplicate(order: Order) {
@@ -164,11 +189,11 @@ export default function DashboardPage() {
 
         {/* Table */}
         <OrdersTable
-          orders={filteredOrders}
+          orders={filteredOrders.filter((o) => !pendingDeleteIds.has(o.id))}
           totalCount={orders.length}
           loading={loading}
           onEdit={(order) => setModal({ type: "edit", order })}
-          onDelete={(order) => setModal({ type: "delete", order })}
+          onDelete={handleDeleteClick}
           onDuplicate={handleDuplicate}
           onStatusChange={handleStatusChange}
           onMarkReturn={handleMarkReturn}
@@ -194,14 +219,6 @@ export default function DashboardPage() {
           order={modal.order}
           onSave={handleEdit}
           onClose={() => setModal({ type: "none" })}
-        />
-      )}
-
-      {modal.type === "delete" && (
-        <DeleteConfirm
-          shopName={modal.order.shopSlug}
-          onConfirm={handleDelete}
-          onCancel={() => setModal({ type: "none" })}
         />
       )}
 

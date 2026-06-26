@@ -16,6 +16,7 @@ export interface OrderRow {
   tech: string | null
   note: string | null
   frozen_delay: number | null
+  refunded_at: string | null
   delivered_at: string | null
   return_carrier: string | null
   return_tracking_number: string | null
@@ -41,6 +42,7 @@ export function rowToOrder(row: OrderRow): Order {
     tech: row.tech ?? undefined,
     note: row.note ?? undefined,
     frozenDelay: row.frozen_delay ?? undefined,
+    refundedAt: row.refunded_at ?? undefined,
     deliveredAt: row.delivered_at ?? undefined,
     returnCarrier: row.return_carrier ?? undefined,
     returnTrackingNumber: row.return_tracking_number ?? undefined,
@@ -67,6 +69,7 @@ export function orderToRow(data: OrderUpdateInput): Partial<OrderRow> {
   if (data.tech !== undefined) row.tech = data.tech || null
   if (data.note !== undefined) row.note = data.note || null
   if (data.frozenDelay !== undefined) row.frozen_delay = data.frozenDelay
+  if (data.refundedAt !== undefined) row.refunded_at = data.refundedAt || null
   if (data.deliveredAt !== undefined) row.delivered_at = data.deliveredAt || null
   if (data.returnCarrier !== undefined) row.return_carrier = data.returnCarrier || null
   if (data.returnTrackingNumber !== undefined) row.return_tracking_number = data.returnTrackingNumber || null

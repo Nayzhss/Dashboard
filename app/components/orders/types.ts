@@ -36,6 +36,10 @@ export interface Order {
   // délai figé quand commande remboursée ou fail
   frozenDelay?: number
 
+  // posée automatiquement à la transition vers Remboursée/Fail — base de
+  // calcul du "Bénéf du mois" (pas paymentDate, qui peut être d'un autre mois)
+  refundedAt?: string
+
   deliveredAt?: string
 
   returnCarrier?: string

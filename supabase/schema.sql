@@ -71,6 +71,16 @@ alter table orders add column if not exists return_frozen_delay int;
 -- date réelle de dépôt du colis retour (auto via 17Track si dispo, sinon manuelle)
 alter table orders add column if not exists return_dropped_at date;
 
+-- date à laquelle la commande est devenue Remboursée/Fail, posée automatiquement
+-- au moment de la transition — "Bénéf du mois" doit se baser sur cette date plutôt
+-- que sur payment_date (un achat de mai peut très bien être remboursé en juin).
+alter table orders add column if not exists refunded_at timestamptz;
+
+-- backfill ponctuel pour les commandes déjà closes avant l'ajout de la colonne :
+-- created_at est la meilleure approximation disponible de la date réelle.
+update orders set refunded_at = created_at
+where status in ('Remboursée', 'Fail') and refunded_at is null;
+
 -- compte utilisé pour la commande (fresh/old) et mode de livraison (domicile/relais)
 alter table orders add column if not exists account_type text;
 alter table orders add column if not exists delivery_type text;

@@ -392,16 +392,18 @@ export function OrdersTable({
             {STATUS_LIST.map((s) => (
               <button
                 key={s}
-                onClick={async () => {
+                onClick={() => {
                   const id = statusMenu
                   if (s === "Retour") {
                     setReturnModalOrderId(id)
                     setStatusMenu(null)
                     return
                   }
-                  await onStatusChange(id, s)
+                  // optimiste : le menu se ferme et la carte flash tout de suite,
+                  // le hook applique le changement et annule si la requête échoue
                   setStatusMenu(null)
                   flash(id)
+                  onStatusChange(id, s)
                 }}
                 className="w-full text-left px-3 py-2 text-xs hover:bg-white/5"
               >

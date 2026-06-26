@@ -107,8 +107,11 @@ export default function AidePage() {
           <Section title="🏬 Page Boutiques" delay={180}>
             <p>
               Liste toutes les boutiques connues, avec leurs méthodes, taux de
-              réussite et un score de <strong>rentabilité</strong> calculé comme
-              montant max ÷ délai moyen de la meilleure méthode (affiché en €/j).
+              réussite et un score de <strong>rentabilité</strong> calculé, pour
+              la meilleure méthode de chaque boutique, comme
+              (montant max × fiabilité) ÷ délai moyen (affiché en €/j). La
+              fiabilité pénalise les méthodes avec peu de vouchs pour éviter
+              qu'un seul coup de chance fasse remonter une boutique risquée.
               Le « Top 3 » en haut reprend simplement les 3 meilleurs scores.
             </p>
             <p>
