@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { parseShopMessage, upsertParsedShop } from "@/lib/telegramShopImport"
+import {
+  parseShopMessage,
+  parseRichShopMessage,
+  upsertParsedShop,
+  type ParsedShop,
+} from "@/lib/telegramShopImport"
 import { sendTelegramMessage } from "@/lib/telegram"
 
 interface TelegramUpdate {
   message?: {
     text?: string
     caption?: string
+    rich_message?: unknown
     chat: { id: number }
   }
 }
@@ -24,16 +30,23 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const update: TelegramUpdate = body
   const message = update.message
-  const text = message?.text ?? message?.caption
 
-  // pas un message texte (photo seule, sticker, commande...) : on log pour debug, on ignore
-  if (!message || !text) {
-    console.log("telegram webhook: no text, full update:", JSON.stringify(body))
+  if (!message) {
     return NextResponse.json({ ok: true })
   }
 
   const chatId = message.chat.id
-  const shop = parseShopMessage(text.split(/\r?\n/))
+
+  let shop: ParsedShop | null = null
+  if (message.rich_message) {
+    shop = parseRichShopMessage(message.rich_message)
+  } else if (message.text ?? message.caption) {
+    shop = parseShopMessage((message.text ?? message.caption ?? "").split(/\r?\n/))
+  } else {
+    // pas de contenu reconnaissable (photo seule, sticker, commande...) : on log pour debug, on ignore
+    console.log("telegram webhook: no text/rich_message, full update:", JSON.stringify(body))
+    return NextResponse.json({ ok: true })
+  }
 
   if (!shop || !shop.name) {
     await sendTelegramMessage(chatId, "⚠️ Message non reconnu, boutique ignorée.")
