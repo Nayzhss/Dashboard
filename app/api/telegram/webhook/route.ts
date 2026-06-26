@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   // pas un message texte (photo seule, sticker, commande...) : on log pour debug, on ignore
   if (!message || !text) {
-    console.log("telegram webhook: no text, update keys:", Object.keys(body), JSON.stringify(body).slice(0, 500))
+    console.log("telegram webhook: no text, full update:", JSON.stringify(body))
     return NextResponse.json({ ok: true })
   }
 
