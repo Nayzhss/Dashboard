@@ -21,12 +21,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const update: TelegramUpdate = await req.json()
+  const body = await req.json()
+  const update: TelegramUpdate = body
   const message = update.message
   const text = message?.text ?? message?.caption
 
-  // pas un message texte (photo seule, sticker, commande...) : on ignore en silence
+  // pas un message texte (photo seule, sticker, commande...) : on log pour debug, on ignore
   if (!message || !text) {
+    console.log("telegram webhook: no text, update keys:", Object.keys(body), JSON.stringify(body).slice(0, 500))
     return NextResponse.json({ ok: true })
   }
 
