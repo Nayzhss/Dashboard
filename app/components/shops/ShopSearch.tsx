@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
-import { getShopScore, SHOP_CATEGORY_CONFIG } from "../../data/shops"
+import { getShopScore, getCategoryConfig } from "../../data/shops"
 import type { Shop } from "../../data/shops"
 
 function fmtScore(score: number) {
@@ -102,7 +102,7 @@ export function ShopSearch({ shops, onSelect }: Props) {
                   {highlight(shop.name, query)}
                 </span>
                 <span className="block text-[10px] text-[var(--text-4)] truncate">
-                  {SHOP_CATEGORY_CONFIG[shop.category].emoji} {SHOP_CATEGORY_CONFIG[shop.category].label}
+                  {getCategoryConfig(shop.category).emoji} {getCategoryConfig(shop.category).label}
                 </span>
               </span>
               <span className="text-xs font-semibold text-[var(--accent-300)] shrink-0">

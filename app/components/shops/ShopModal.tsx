@@ -2,7 +2,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { useShops } from "../../hooks/useShops"
-import { SHOP_CATEGORY_LIST, SHOP_CATEGORY_CONFIG } from "../../data/shops"
+import { SHOP_CATEGORY_LIST, SHOP_CATEGORY_CONFIG, getCategoryConfig } from "../../data/shops"
 import type { Shop, ShopCategory } from "../../data/shops"
 
 interface Props {
@@ -129,7 +129,7 @@ export function ShopModal({ slug, onClose }: Props) {
             <div className="flex items-center gap-1.5 mt-0.5">
               <p className="text-xs text-[var(--text-4)]">{shop.slug}</p>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-[var(--text-3)]">
-                {SHOP_CATEGORY_CONFIG[shop.category].emoji} {SHOP_CATEGORY_CONFIG[shop.category].label}
+                {getCategoryConfig(shop.category).emoji} {getCategoryConfig(shop.category).label}
               </span>
             </div>
           </div>

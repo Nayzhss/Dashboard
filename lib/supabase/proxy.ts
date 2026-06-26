@@ -7,6 +7,7 @@ const PUBLIC_API_PATHS = [
   "/api/auth/resolve-username",
   "/api/backup",
   "/api/cron/check-deliveries",
+  "/api/telegram/webhook",
 ]
 
 export async function updateSession(request: NextRequest) {

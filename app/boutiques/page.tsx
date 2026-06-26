@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Image from "next/image"
-import { getShopScore, SHOP_CATEGORY_LIST, SHOP_CATEGORY_CONFIG } from "../data/shops"
+import { getShopScore, getCategoryConfig, SHOP_CATEGORY_LIST, SHOP_CATEGORY_CONFIG } from "../data/shops"
 import type { ShopCategory } from "../data/shops"
 import { useShops } from "../hooks/useShops"
 import { ShopModal } from "../components/shops/ShopModal"
@@ -148,7 +148,7 @@ export default function BoutiquesPage() {
                     </p>
 
                     <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-[var(--text-3)]">
-                      {SHOP_CATEGORY_CONFIG[shop.category].emoji} {SHOP_CATEGORY_CONFIG[shop.category].label}
+                      {getCategoryConfig(shop.category).emoji} {getCategoryConfig(shop.category).label}
                     </span>
 
                     <p className="mt-3 text-lg font-semibold text-[var(--accent-300)]">
@@ -192,7 +192,7 @@ export default function BoutiquesPage() {
 
                     <div className="mt-3 flex items-center justify-between">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-[var(--text-3)]">
-                        {SHOP_CATEGORY_CONFIG[shop.category].emoji} {SHOP_CATEGORY_CONFIG[shop.category].label}
+                        {getCategoryConfig(shop.category).emoji} {getCategoryConfig(shop.category).label}
                       </span>
                     </div>
 

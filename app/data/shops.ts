@@ -17,6 +17,7 @@ export type ShopCategory =
   | "nutrition"
   | "alimentation"
   | "bricolage-auto"
+  | "voyage"
   | "autre"
 
 export const SHOP_CATEGORY_LIST: ShopCategory[] = [
@@ -30,6 +31,7 @@ export const SHOP_CATEGORY_LIST: ShopCategory[] = [
   "nutrition",
   "alimentation",
   "bricolage-auto",
+  "voyage",
   "autre",
 ]
 
@@ -44,7 +46,17 @@ export const SHOP_CATEGORY_CONFIG: Record<ShopCategory, { label: string; emoji: 
   nutrition: { label: "Nutrition", emoji: "🥤" },
   alimentation: { label: "Alimentation", emoji: "🍔" },
   "bricolage-auto": { label: "Bricolage & Auto", emoji: "🔧" },
+  voyage: { label: "Voyage", emoji: "✈️" },
   autre: { label: "Autre", emoji: "✨" },
+}
+
+/**
+ * Lookup défensif : une catégorie venant de la DB qui ne correspond à
+ * aucune clé connue (saisie manuelle dans Supabase, futur import Telegram
+ * mal mappé...) retombe sur "Autre" plutôt que de faire planter l'UI.
+ */
+export function getCategoryConfig(category: string) {
+  return SHOP_CATEGORY_CONFIG[category as ShopCategory] ?? SHOP_CATEGORY_CONFIG.autre
 }
 
 export interface Shop {
